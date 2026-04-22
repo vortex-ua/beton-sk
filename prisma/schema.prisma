@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Таблица для хранения текстов блоков (наш Inline Editor)
+model StrankaObsah {
+  id          Int      @id @default(autoincrement())
+  stranka     String   // "domov"
+  sekcia      String   @unique // "domov-o-nas"
+  obsah       Json     // JSON со всеми текстами
+  updatedAt   DateTime @updatedAt
+}
+
+// Таблица для продуктов (Коллекции)
+model Produkt {
+  id          Int      @id @default(autoincrement())
+  tag         String   
+  title       String   
+  description String   
+  mainImage   String   
+  gallery     String[] 
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Таблица для заявок от клиентов
+model Objednavka {
+  id        Int      @id @default(autoincrement())
+  meno      String
+  telefon   String
+  email     String?
+  sprava    String?
+  status    String   @default("Nové") 
+  createdAt DateTime @default(now())
+}
