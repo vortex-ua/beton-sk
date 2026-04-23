@@ -3,6 +3,7 @@ import About from "@/components/home/About";
 import Services from "@/components/home/Services";
 import Reviews from "@/components/home/Reviews";
 import { getContent } from "@/actions/adminActions";
+export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   // 1. Получаем данные для блока "О нас"
