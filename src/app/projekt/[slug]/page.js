@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, MapPin } from "lucide-react";
-
+import ProjectGallery from "@/components/portfolio/ProjectGallery";
 export default async function ProjectPage({ params }) {
   const resolvedParams = await params;
   const slug = resolvedParams.slug;
@@ -14,9 +14,11 @@ export default async function ProjectPage({ params }) {
   if (!project) notFound();
 
   return (
+
     <div className="bg-white min-h-screen pt-32 pb-24">
+
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         <Link href="/realizacie" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-400 hover:text-slate-900 mb-12 transition-colors group">
           <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" /> Späť na realizácie
         </Link>
@@ -28,7 +30,7 @@ export default async function ProjectPage({ params }) {
             {project.location && (
               <>
                 <span className="text-slate-300">•</span>
-                <span className="text-slate-500 flex items-center gap-1"><MapPin size={16}/> {project.location}</span>
+                <span className="text-slate-500 flex items-center gap-1"><MapPin size={16} /> {project.location}</span>
               </>
             )}
           </div>
@@ -41,15 +43,13 @@ export default async function ProjectPage({ params }) {
         </div>
 
         {/* Галерея */}
-        {project.images && project.images.length > 0 && (
+        {/* {project.images && project.images.length > 0 && (
           <div className="mt-16 pt-16 border-t border-slate-100">
             <h3 className="text-2xl font-bold text-slate-900 mb-8">Galéria projektu</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Главное фото тоже добавляем в галерею первым */}
               <div className="aspect-square rounded-2xl overflow-hidden bg-slate-100">
                 <img src={project.mainImage} alt="Main" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
               </div>
-              {/* Остальные фото */}
               {project.images.map((imgUrl, index) => (
                 <div key={index} className="aspect-square rounded-2xl overflow-hidden bg-slate-100">
                   <img src={imgUrl} alt={`${project.title} - foto ${index + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
@@ -57,8 +57,10 @@ export default async function ProjectPage({ params }) {
               ))}
             </div>
           </div>
-        )}
-
+        )} */}
+        <div className="mt-12">
+          <ProjectGallery images={project.images} title={project.title} />
+        </div>
       </div>
     </div>
   );

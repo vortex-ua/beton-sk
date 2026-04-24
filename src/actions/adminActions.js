@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { put } from '@vercel/blob';
 // 1. Импортируем функцию для сброса кэша
 import { revalidatePath } from "next/cache";
 
@@ -120,11 +121,8 @@ export async function deleteCollection(id) {
   }
 }
 
-// --- FUNKCIE PRE PORTFÓLIO (REALIZÁCIE) ---
-
 export async function createProject(data) {
   try {
-    // 1. Генерация уникального slug (ссылки)
     const baseSlug = data.title
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
@@ -139,17 +137,13 @@ export async function createProject(data) {
       counter++;
     }
 
-    // 2. Безопасный парсинг массива картинок
+    // УНИВЕРСАЛЬНЫЙ ПАРСИНГ ГАЛЕРЕИ
     let parsedImages = [];
     if (data.images) {
-      try {
-        parsedImages = JSON.parse(data.images);
-      } catch (e) {
-        parsedImages = [];
-      }
+      // Если это уже массив — берем его, если строка — парсим
+      parsedImages = Array.isArray(data.images) ? data.images : JSON.parse(data.images);
     }
     
-    // 3. Создание записи в базе
     const newProject = await prisma.project.create({
       data: {
         title: data.title,
@@ -158,10 +152,11 @@ export async function createProject(data) {
         description: data.description,
         mainImage: data.mainImage,
         location: data.location || null,
-        images: parsedImages, // Сохраняем галерею
+        images: parsedImages, 
       },
     });
     
+    revalidatePath("/realizacie");
     return { success: true, data: newProject };
   } catch (error) {
     console.error("Chyba pri vytváraní projektu:", error);
@@ -169,24 +164,12 @@ export async function createProject(data) {
   }
 }
 
-export async function deleteProject(id) {
-  try {
-    await prisma.project.delete({ where: { id: Number(id) } });
-    return { success: true };
-  } catch (error) {
-    return { success: false, error: error.message };
-  }
-}
 export async function updateProject(id, data) {
   try {
-    // Безопасно парсим JSON-строку из формы в массив
     let parsedImages = [];
     if (data.images) {
-      try {
-        parsedImages = JSON.parse(data.images);
-      } catch (e) {
-        parsedImages = [];
-      }
+      // Улучшенная проверка: массив или строка
+      parsedImages = Array.isArray(data.images) ? data.images : JSON.parse(data.images);
     }
 
     const updatedProject = await prisma.project.update({
@@ -197,12 +180,30 @@ export async function updateProject(id, data) {
         location: data.location,
         description: data.description,
         mainImage: data.mainImage,
-        images: parsedImages, // Передаем корректный массив в базу
+        images: parsedImages, 
       },
     });
+
+    // Обязательно сбрасываем кэш, чтобы новые фото появились сразу
+    revalidatePath("/realizacie");
+    revalidatePath(`/projekt/${updatedProject.slug}`);
+    
     return { success: true, data: updatedProject };
   } catch (error) {
     console.error("Chyba pri aktualizácii projektu:", error);
     return { success: false, error: error.message };
   }
+}
+export async function deleteProject(id) {
+  try {
+    await prisma.project.delete({ where: { id: Number(id) } });
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+export async function uploadImage(file) {
+  // Вместо записи файла на диск, отправляем его в облако Vercel
+  const blob = await put(file.name, file, { access: 'public' });
+  return blob.url; // Возвращаем https://... ссылку
 }
