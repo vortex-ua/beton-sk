@@ -39,7 +39,7 @@ export default function Reviews({ editMode = false, dbData, approvedReviews = []
     const formData = new FormData(e.target);
     const res = await submitReview(formData);
     if (res.success) {
-      alert("Ďakujeme! Ваша recenzia bola odoslaná na schválenie.");
+      alert("Ďakujeme! Vaša recenzia bola odoslaná na schválenie.");
       setIsFormOpen(false);
       e.target.reset();
     }
@@ -59,28 +59,28 @@ export default function Reviews({ editMode = false, dbData, approvedReviews = []
     return {
       contentEditable: true,
       suppressContentEditableWarning: true,
-      className: "outline-none focus:ring-2 focus:ring-red-600 rounded hover:bg-white/5 px-1",
+      className: "outline-none focus:ring-2 focus:ring-red-600 rounded hover:bg-white/5 px-1 break-words whitespace-pre-wrap",
     };
   };
 
   return (
-    <section className="py-32 bg-black text-white overflow-hidden relative border-t border-neutral-900 selection:bg-red-900selection:text-red-100">
+    <section className="py-32 bg-black text-white overflow-hidden relative border-t border-neutral-900 selection:bg-red-900 selection:text-red-100">
       
-      {/* BACKGROUND DECO TEXT - Очень тонко, еле заметно */}
+      {/* BACKGROUND DECO TEXT */}
       <div className="absolute top-0 right-0 text-[25vw] font-black text-[#0d0d0d] leading-none select-none pointer-events-none -translate-y-1/3 uppercase">
         Clients
       </div>
 
       <div className="max-w-7xl mx-auto px-4 relative z-10">
         
-        {/* HEADER - Строгий, архитектурный */}
+        {/* HEADER */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-24 gap-10 border-l-4 border-red-600 pl-8">
-          <div className="max-w-4xl">
+          <div className="max-w-4xl overflow-hidden">
             <p className="text-red-600 font-black uppercase tracking-[0.5em] text-[9px] mb-4">Referencie / Realizácie v čase</p>
             <h2 
               {...getEditableProps("title")}
               onBlur={(e) => { const nt = e.target.innerText; setTitle(nt); saveAll(staticReviews, nt); }}
-              className="text-5xl md:text-8xl font-black tracking-tighter uppercase leading-[0.8]"
+              className={`text-5xl md:text-8xl font-black tracking-tighter uppercase leading-[0.8] break-words whitespace-pre-wrap max-w-full ${editMode ? "" : "outline-none"}`}
             >
               {title}
             </h2>
@@ -114,7 +114,7 @@ export default function Reviews({ editMode = false, dbData, approvedReviews = []
         >
           {displayReviews.map((rev, idx) => (
             <div key={rev.id} className="snap-center p-2 group h-full">
-              <div className="bg-[#0a0a0a] h-full p-12 md:p-16 relative border border-neutral-800 rounded-none transition-all duration-500 group-hover:border-red-600/60 flex flex-col justify-between">
+              <div className="bg-[#0a0a0a] h-full p-12 md:p-16 relative border border-neutral-800 rounded-none transition-all duration-500 group-hover:border-red-600/60 flex flex-col justify-between overflow-hidden">
                 
                 {/* ТЕХНИЧЕСКИЙ НОМЕР */}
                 <div className="absolute top-6 left-10 text-xs font-mono text-neutral-800 group-hover:text-red-600/40 transition-colors pointer-events-none">
@@ -128,11 +128,12 @@ export default function Reviews({ editMode = false, dbData, approvedReviews = []
                   </button>
                 )}
 
-                <div className="relative z-10 space-y-12">
-                  <Quote className="text-red-600" size={36} strokeWidth={1.5} />
+                {/* КОНТЕНТ ОТЗЫВА - с защитой от длинных слов */}
+                <div className="relative z-10 space-y-12 max-w-full overflow-hidden">
+                  <Quote className="text-red-600 shrink-0" size={36} strokeWidth={1.5} />
                   
                   <p 
-                    className="text-xl md:text-3xl font-light text-slate-100 leading-snug tracking-tight outline-none italic"
+                    className={`text-xl md:text-3xl font-light text-slate-100 leading-snug tracking-tight outline-none italic break-words whitespace-pre-wrap max-w-full ${editMode && !rev.isFromDb ? "outline-none focus:ring-2 focus:ring-red-600 rounded hover:bg-white/5" : ""}`}
                     contentEditable={editMode && !rev.isFromDb}
                     suppressContentEditableWarning
                     onBlur={(e) => { 
@@ -144,13 +145,13 @@ export default function Reviews({ editMode = false, dbData, approvedReviews = []
                   </p>
                 </div>
 
-                <div className="flex items-center gap-6 pt-10 border-t border-neutral-900 mt-12">
-                  <div className="w-16 h-16 bg-neutral-950 rounded-none flex items-center justify-center text-red-600 border border-neutral-800 text-3xl font-black shadow-inner">
+                <div className="flex items-center gap-6 pt-10 border-t border-neutral-900 mt-12 max-w-full overflow-hidden">
+                  <div className="w-16 h-16 bg-neutral-950 rounded-none flex items-center justify-center text-red-600 border border-neutral-800 text-3xl font-black shadow-inner shrink-0">
                     <User size={30} strokeWidth={1}/>
                   </div>
-                  <div>
+                  <div className="overflow-hidden max-w-full">
                     <div 
-                      className="font-black text-white uppercase tracking-tighter text-2xl outline-none"
+                      className={`font-black text-white uppercase tracking-tighter text-2xl outline-none break-words whitespace-pre-wrap max-w-full ${editMode && !rev.isFromDb ? "outline-none focus:ring-2 focus:ring-red-600 rounded hover:bg-white/5" : ""}`}
                       contentEditable={editMode && !rev.isFromDb}
                       suppressContentEditableWarning
                       onBlur={(e) => { 
@@ -160,7 +161,7 @@ export default function Reviews({ editMode = false, dbData, approvedReviews = []
                     >
                       {rev.autor}
                     </div>
-                    <div className="text-red-600 text-[10px] font-black uppercase tracking-[0.4em] mt-1 border border-red-600/30 px-2 py-0.5 w-fit">
+                    <div className="text-red-600 text-[10px] font-black uppercase tracking-[0.4em] mt-1 border border-red-600/30 px-2 py-0.5 w-fit break-words">
                       {rev.mesto}
                     </div>
                   </div>
@@ -171,10 +172,11 @@ export default function Reviews({ editMode = false, dbData, approvedReviews = []
         </div>
       </div>
 
-      {/* FORM MODAL - Elite Industrial Style */}
+      {/* FORM MODAL */}
       {isFormOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/98 backdrop-blur-md shadow-2xl">
           <form onSubmit={handleClientSubmit} className="bg-[#050505] p-12 md:p-16 border-2 border-white w-full max-w-2xl shadow-[20px_20px_0px_0px_rgba(220,38,38,1)]">
+            {/* Содержимое формы (без изменений, textarea и input переносят по дефолту) */}
             <div className="flex items-center justify-between mb-12 pb-6 border-b-2 border-white/10">
                 <h3 className="text-4xl font-black uppercase tracking-tighter text-white">Pridať referenciu</h3>
                 <span className="text-[9px] font-mono text-slate-700 tracking-widest">// NEW_ENTRY</span>
@@ -188,21 +190,21 @@ export default function Reviews({ editMode = false, dbData, approvedReviews = []
               <div className="space-y-3">
                 <label className="text-[10px] font-black uppercase tracking-[.4em] text-slate-500 ml-1">Vaše hodnotenie</label>
                 <select name="rating" className="w-full bg-black border border-neutral-800 p-5 outline-none focus:border-red-600 transition-all text-white font-bold cursor-pointer appearance-none rounded-none uppercase text-sm">
-                  <option value="5" className="bg-slate-900">⭐⭐⭐⭐⭐ 5/5 (Vynikajúce)</option>
-                  <option value="4" className="bg-slate-900">⭐⭐⭐⭐ 4/5 (Veľmi dobré)</option>
+                  <option value="5" className="bg-slate-900">⭐⭐⭐⭐⭐ 5/5</option>
+                  <option value="4" className="bg-slate-900">⭐⭐⭐⭐ 4/5</option>
                 </select>
               </div>
             </div>
 
             <div className="space-y-3 mb-12">
-              <label className="text-[10px] font-black uppercase tracking-[.4em] text-slate-500 ml-1">Vaša skúsenosť / Popis realizácie</label>
-              <textarea name="text" placeholder="Sem napíšte vaše hodnotenie, ako ste boli spokojní so zameraním, montážou и výsledkom..." required className="w-full bg-black border border-neutral-800 p-5 outline-none focus:border-red-600 transition-all h-36 text-white placeholder:text-slate-800 font-medium resize-none text-sm rounded-none" />
+              <label className="text-[10px] font-black uppercase tracking-[.4em] text-slate-500 ml-1">Vaša skúsenosť</label>
+              <textarea name="text" placeholder="Sem napíšte vaše hodnotenie..." required className="w-full bg-black border border-neutral-800 p-5 outline-none focus:border-red-600 transition-all h-36 text-white placeholder:text-slate-800 font-medium resize-none text-sm rounded-none" />
             </div>
 
             <div className="flex gap-6 pt-6 border-t border-white/10">
-              <button type="button" onClick={() => setIsFormOpen(false)} className="flex-1 py-5 font-black text-slate-500 hover:text-white uppercase tracking-widest text-[10px] transition-colors border border-neutral-800 rounded-none active:scale-95">Zrušiť</button>
-              <button disabled={isSubmitting} type="submit" className="flex-[2] py-5 bg-red-600 hover:bg-white hover:text-black text-white font-black uppercase tracking-widest text-[10px] transition-all disabled:opacity-50 rounded-none shadow-lg active:scale-95 shadow-red-600/10">
-                {isSubmitting ? "Odosielam dáta..." : "Odoslať na overenie"}
+              <button type="button" onClick={() => setIsFormOpen(false)} className="flex-1 py-5 font-black text-slate-500 hover:text-white uppercase tracking-widest text-[10px] transition-colors border border-neutral-800 rounded-none">Zrušiť</button>
+              <button disabled={isSubmitting} type="submit" className="flex-[2] py-5 bg-red-600 hover:bg-white hover:text-black text-white font-black uppercase tracking-widest text-[10px] transition-all disabled:opacity-50 rounded-none shadow-lg">
+                {isSubmitting ? "Odosielam..." : "Odoslať"}
               </button>
             </div>
           </form>

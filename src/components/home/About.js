@@ -93,9 +93,7 @@ export default function About({ editMode = false, dbData = defaultData }) {
                   {content.odstavec2}
                 </span>
                 {" "}
-                <span className="font-semibold text-slate-900">
-                  Kde iní prezentujú takýto povrch ako exkluzívny, u nás je to štandard.
-                </span>
+              
               </p>
               
               <p 
