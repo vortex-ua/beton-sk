@@ -8,8 +8,8 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const navLinks = [
-    { name: "O nás", href: "#onas" },
-    { name: "Produkty", href: "/produkty" },
+    { name: "O nás", href: "/#onas" },
+    { name: "Služby", href: "/#sluzby" },
     { name: "Realizácie", href: "/realizacie" },
     { name: "Kontakt", href: "/kontakt" },
   ];
@@ -37,12 +37,7 @@ const Navbar = () => {
                 {link.name}
               </Link>
             ))}
-            <Link 
-              href="/kalkulacia" 
-              className="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-md text-sm font-bold transition-all shadow-lg hover:shadow-red-500/20"
-            >
-              CENOVÁ PONUKA
-            </Link>
+            
           </div>
 
           {/* Мобильная кнопка */}
@@ -77,12 +72,7 @@ const Navbar = () => {
                   {link.name}
                 </Link>
               ))}
-              <Link
-                href="/kalkulacia"
-                className="block w-full text-center bg-red-600 text-white px-3 py-4 rounded-md font-bold shadow-md"
-              >
-                CENOVÁ PONUKA
-              </Link>
+             
             </div>
           </motion.div>
         )}

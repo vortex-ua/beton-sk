@@ -36,20 +36,7 @@ export default function Hero() {
           Profesionálna montáž po celom Slovensku.
         </p>
 
-        <div className="mt-12 flex flex-col sm:flex-row gap-5 justify-center items-center">
-          <Link 
-            href="/ziadost" 
-            className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white px-12 py-5 rounded-sm font-black text-lg transition-all uppercase tracking-widest shadow-2xl"
-          >
-            Cenová kalkulácia
-          </Link>
-          <Link 
-            href="/ponuka" 
-            className="w-full sm:w-auto bg-white/5 backdrop-blur-sm hover:bg-white/10 text-white border border-white/20 px-12 py-5 rounded-sm font-bold text-lg transition-all uppercase tracking-widest"
-          >
-            Naša ponuka
-          </Link>
-        </div>
+        
       </div>
 
       {/* Декоративная стрелка вниз (Scroll Indicator) */}

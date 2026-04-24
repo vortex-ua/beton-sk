@@ -1,67 +1,98 @@
 "use client";
 import { useState } from "react";
-import { sendLead } from "@/actions/contactActions";
-import { Send, CheckCircle2 } from "lucide-react";
+import { sendContactEmail } from "@/actions/emailActions";
 
 export default function ContactForm() {
-  const [status, setStatus] = useState("idle");
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState(null); // 'success' | 'error' | null
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setStatus("loading");
-    const formData = new FormData(e.target);
-    const result = await sendLead(formData);
-    if (result.success) setStatus("success");
-    else {
-      alert("Chyba pri odosielaní.");
-      setStatus("idle");
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setLoading(true);
+    setStatus(null);
+
+    const formData = new FormData(event.target);
+    const result = await sendContactEmail(formData);
+
+    setLoading(false);
+    if (result.success) {
+      setStatus('success');
+      event.target.reset();
+    } else {
+      setStatus('error');
     }
   }
 
-  if (status === "success") {
+  if (status === 'success') {
     return (
-      <div className="py-10 text-center">
-        <CheckCircle2 size={48} className="text-green-500 mx-auto mb-4" />
-        <h3 className="text-lg font-bold text-slate-900">Odoslané!</h3>
+      <div className="py-10 text-center animate-in fade-in duration-500">
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 text-green-600 mb-4">
+          ✓
+        </div>
+        <h3 className="text-xl font-bold text-slate-900 mb-2">Správa odoslaná</h3>
+        <p className="text-slate-500 text-sm">Budeme vás kontaktovať v čo najkratšom čase.</p>
+        <button onClick={() => setStatus(null)} className="mt-6 text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-colors">
+          Poslať ďalšiu správu
+        </button>
       </div>
     );
   }
 
-  // Используем clamp или просто адаптивные отступы
-  const inputStyle = "w-full bg-transparent border-b border-slate-200 py-2 md:py-3 outline-none focus:border-slate-900 transition-colors placeholder:text-slate-400 text-slate-700 font-light mb-4 md:mb-6 text-sm md:text-base";
-
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col w-full">
-      <input type="text" name="meno_sprava" required placeholder="Meno a Priezvisko" className={inputStyle} />
-      <input type="email" name="email_spravas" required placeholder="Váš e-mail" className={inputStyle} />
-      <input type="tel" name="tel_sprava" required placeholder="Váš telefón" defaultValue="+" className={inputStyle} />
-      <input type="text" name="predmet" required placeholder="Predmet správy" className={inputStyle} />
-      
-      <div className="relative mb-6 md:mb-8">
-         <label className="text-slate-900 font-bold text-[10px] md:text-xs mb-1 block uppercase tracking-wider">Správa</label>
-         <textarea 
-            name="text_sprava" 
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-1">
+        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Meno a priezvisko</label>
+        <input 
+          name="name" 
+          required 
+          className="w-full border-b border-slate-200 py-3 px-1 outline-none focus:border-slate-900 transition-colors bg-transparent text-slate-900" 
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-1">
+          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">E-mail</label>
+          <input 
+            name="email" 
+            type="email" 
             required 
-            rows={1} 
-            className="w-full bg-transparent border-b border-slate-200 py-2 outline-none focus:border-slate-900 resize-none font-light text-sm md:text-base"
-         ></textarea>
+            className="w-full border-b border-slate-200 py-3 px-1 outline-none focus:border-slate-900 transition-colors bg-transparent text-slate-900" 
+          />
+        </div>
+        <div className="space-y-1">
+          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Telefón</label>
+          <input 
+            name="phone" 
+            required 
+            className="w-full border-b border-slate-200 py-3 px-1 outline-none focus:border-slate-900 transition-colors bg-transparent text-slate-900" 
+          />
+        </div>
       </div>
 
-      <div className="flex items-start gap-3 mb-8">
-        <input type="checkbox" required className="mt-1 shrink-0 w-3.5 h-3.5 accent-slate-900 cursor-pointer" />
-        <p className="text-[10px] md:text-[11px] leading-tight text-slate-500">
-          Súhlasím so spracovaním osobných údajov (GDPR).
-        </p>
+      <div className="space-y-1">
+        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Vaša správa</label>
+        <textarea 
+          name="message" 
+          required 
+          rows={3} 
+          className="w-full border-b border-slate-200 py-3 px-1 outline-none focus:border-slate-900 transition-colors bg-transparent resize-none text-slate-900" 
+        />
       </div>
 
-      <button 
-        type="submit" 
-        disabled={status === "loading"}
-        className="w-full sm:w-fit bg-[#272f60] hover:bg-[#1a1f40] text-white px-8 py-3 md:py-4 flex items-center justify-center gap-3 font-bold transition-all disabled:opacity-50 text-xs md:text-sm uppercase tracking-widest"
-      >
-        <Send size={16} />
-        {status === "loading" ? "Odosielam..." : "Odoslať správu"}
-      </button>
+      <div className="pt-4">
+        <button 
+          type="submit" 
+          disabled={loading}
+          className="bg-slate-900 text-white px-10 py-4 text-xs font-black uppercase tracking-[0.2em] hover:bg-[#d90416] transition-colors disabled:opacity-50"
+        >
+          {loading ? "Odosielam..." : "Odoslať správu"}
+        </button>
+        {status === 'error' && (
+          <p className="text-red-600 text-[10px] font-bold mt-4 uppercase tracking-widest">
+            Chyba pri odosielaní. Skúste to neskôr.
+          </p>
+        )}
+      </div>
     </form>
   );
 }

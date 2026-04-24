@@ -115,7 +115,7 @@ export default function Services({ editMode = false, dbData = defaultData }) {
   );
 
   return (
-    <section className={`py-24 bg-slate-50 relative ${editMode ? 'border-4 border-dashed border-red-200' : ''}`}>
+    <section id="sluzby"  className={`py-24 bg-slate-50 relative ${editMode ? 'border-4 border-dashed border-red-200' : ''}`}>
       {editMode && (
         <div className="absolute top-0 left-0 bg-red-600 text-white text-xs font-bold px-3 py-1 uppercase rounded-br-lg z-50">
           Úprava: SLUŽBY
