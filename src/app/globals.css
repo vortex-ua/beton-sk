@@ -24,3 +24,31 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+/* 1. Заставляем картинку в лайтбоксе быть на весь экран */
+/* Убираем все лимиты лайтбокса и заставляем фото занимать 100% пространства слайда */
+.yarl__slide_image {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important; /* Фото не обрежется, но займет весь экран */
+}
+
+/* Убираем внутренние отступы самой библиотеки */
+.yarl__slide {
+  padding: 0 !important;
+}
+
+
+/* 3. Центрируем, если фото меньше экрана */
+.yarl__flex_center {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}/* Гарантируем одинаковый размер карточек в портфолио */
+.project-card-image {
+  aspect-ratio: 16 / 9 !important; /* Или 1 / 1 для квадратов */
+  width: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+}
