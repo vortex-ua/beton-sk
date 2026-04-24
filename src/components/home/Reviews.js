@@ -2,10 +2,13 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { saveContent } from "@/actions/adminActions";
 import { submitReview } from "@/actions/reviewActions";
-import { Quote, Plus, Trash2, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { 
+  Quote, Plus, Trash2, ChevronLeft, ChevronRight, 
+  User, X, Star, Check 
+} from "lucide-react";
 
 const defaultReviews = [
-  { id: 1, text: "Plot stojí už 8 rokov a vyzerá ako nový. Žiadne praskliny, žiadne problémy. Maximálna spokojnosť s prístupom aj montážou od začiatku až do konca.", autor: "Martin K.", mesto: "Bratislava" }
+  { id: 1, text: "Plot stojí už 8 rokov a vyzerá ako nový. Žiadne praskliny, žiadne problémy. Maximálna spokojnosť s prístupom aj montážou.", autor: "Martin K.", mesto: "Bratislava" }
 ];
 
 export default function Reviews({ editMode = false, dbData, approvedReviews = [] }) {
@@ -16,9 +19,15 @@ export default function Reviews({ editMode = false, dbData, approvedReviews = []
   const [expandedReview, setExpandedReview] = useState(null);
   const scrollRef = useRef(null);
 
+  // Блокировка скролла страницы
   useEffect(() => {
     document.body.style.overflow = (expandedReview || isFormOpen) ? 'hidden' : 'unset';
   }, [expandedReview, isFormOpen]);
+
+  useEffect(() => {
+    if (dbData?.items) setStaticReviews(dbData.items);
+    if (dbData?.title) setTitle(dbData.title);
+  }, [dbData]);
 
   const displayReviews = useMemo(() => {
     const fromDb = approvedReviews.map(r => ({
@@ -34,14 +43,21 @@ export default function Reviews({ editMode = false, dbData, approvedReviews = []
   const handleClientSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const formData = new FormData(e.target);
-    const res = await submitReview(formData);
-    if (res.success) {
-      alert("Ďakujeme!");
-      setIsFormOpen(false);
-      e.target.reset();
+    try {
+      const formData = new FormData(e.target);
+      const res = await submitReview(formData);
+      if (res.success) {
+        alert("Ďakujeme! Vaša recenzia bola odoslaná na schválenie.");
+        setIsFormOpen(false);
+        e.target.reset();
+      } else {
+        alert("Chyba: " + (res.error || "Nepodarilo sa odoslať."));
+      }
+    } catch (err) {
+      alert("Chyba pripojenia k serveru.");
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsSubmitting(false);
   };
 
   const scroll = (direction) => {
@@ -55,9 +71,10 @@ export default function Reviews({ editMode = false, dbData, approvedReviews = []
   return (
     <section className="py-24 bg-black text-white overflow-hidden relative border-t border-neutral-900 font-sans">
       <div className="max-w-7xl mx-auto px-4 relative z-10">
-        {/* HEADER СЕКЦИИ */}
+        
+        {/* HEADER */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-10 border-l-4 border-red-600 pl-8">
-          <div className="max-w-4xl">
+          <div className="max-w-4xl overflow-hidden">
             <h2 
               contentEditable={editMode}
               suppressContentEditableWarning
@@ -79,7 +96,7 @@ export default function Reviews({ editMode = false, dbData, approvedReviews = []
           </div>
         </div>
 
-        {/* СЛАЙДЕР */}
+        {/* SLIDER */}
         <div ref={scrollRef} className="grid grid-flow-col auto-cols-[100%] md:auto-cols-[500px] gap-0 overflow-x-auto snap-x snap-mandatory pb-8 no-scrollbar" style={{ scrollBehavior: 'smooth' }}>
           {displayReviews.map((rev, idx) => {
             const isLong = rev.text.length > 120;
@@ -106,36 +123,26 @@ export default function Reviews({ editMode = false, dbData, approvedReviews = []
         </div>
       </div>
 
-      {/* МОДАЛКА: 50% ШИРИНЫ + ВЕРТИКАЛЬНЫЙ СКРОЛЛ */}
+      {/* МОДАЛКА: ПРОСМОТР ТЕКСТА (50% ШИРИНЫ) */}
       {expandedReview && (
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
-          {/* Backdrop */}
           <div className="absolute inset-0 bg-black/95 backdrop-blur-xl" onClick={() => setExpandedReview(null)}></div>
-          
           <div 
-            className="relative z-10 w-full md:w-1/2 bg-black border border-neutral-800 flex flex-col max-h-[85vh] shadow-[0_0_50px_rgba(220,38,38,0.1)]"
+            className="relative z-10 w-full md:w-1/2 bg-black border border-neutral-800 flex flex-col max-h-[85vh] shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Кнопка закрытия */}
-            <button 
-              onClick={() => setExpandedReview(null)} 
-              className="absolute top-6 right-6 text-neutral-500 hover:text-red-600 transition-all z-20"
-            >
+            <button onClick={() => setExpandedReview(null)} className="absolute top-6 right-6 text-neutral-500 hover:text-white transition-all z-30">
               <X size={32} />
             </button>
-
-            {/* Контент с вертикальным скроллом */}
-            <div className="p-8 md:p-16 overflow-y-auto custom-scrollbar-red">
+            <div className="p-8 md:p-16 overflow-y-auto overflow-x-hidden custom-scrollbar-red">
               <Quote className="text-red-600 mb-8 opacity-30" size={48} />
-              
               <div className="space-y-12">
-                <p className="text-2xl md:text-3xl lg:text-4xl font-light text-white leading-tight tracking-tight italic break-words whitespace-pre-wrap">
+                <p className="text-2xl md:text-3xl font-light text-white leading-tight tracking-tight italic break-words whitespace-pre-wrap">
                   "{expandedReview.text}"
                 </p>
-                
                 <div className="pt-10 border-t border-neutral-900">
                   <div className="font-black text-white uppercase tracking-tighter text-2xl">{expandedReview.autor}</div>
-                  <div className="text-red-600 text-[10px] font-black uppercase tracking-[0.4em] mt-2 border border-red-600/20 px-3 py-1 w-fit">
+                  <div className="text-red-600 text-[10px] font-black uppercase tracking-[0.4em] mt-2 border border-red-600/20 px-3 py-1 w-fit uppercase">
                     {expandedReview.mesto}
                   </div>
                 </div>
@@ -145,29 +152,44 @@ export default function Reviews({ editMode = false, dbData, approvedReviews = []
         </div>
       )}
 
-      {/* ФОРМА: В ТОМ ЖЕ СТИЛЕ (50% ШИРИНЫ) */}
+      {/* МОДАЛКА: ФОРМА (50% ШИРИНЫ) */}
       {isFormOpen && (
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/95 backdrop-blur-xl" onClick={() => setIsFormOpen(false)}></div>
-          
           <form 
             onSubmit={handleClientSubmit}
-            className="relative z-10 w-full md:w-1/2 bg-black border border-white p-8 md:p-16 flex flex-col max-h-[90vh] overflow-y-auto no-scrollbar"
+            className="relative z-10 w-full md:w-1/2 bg-black border border-white p-8 md:p-16 flex flex-col max-h-[90vh] overflow-y-auto overflow-x-hidden no-scrollbar shadow-[25px_25px_0px_0px_rgba(220,38,38,1)]"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-white mb-12">Napísať <br/><span className="text-red-600">Recenziu</span></h3>
-            
             <div className="space-y-8">
                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <input name="author" placeholder="MENO" required className="w-full bg-transparent border-b-2 border-neutral-800 py-4 outline-none focus:border-red-600 text-white font-black text-xl placeholder:text-neutral-900 uppercase" />
-                  <input name="mesto" placeholder="MESTO" className="w-full bg-transparent border-b-2 border-neutral-800 py-4 outline-none focus:border-red-600 text-white font-black text-xl placeholder:text-neutral-900 uppercase" />
+                  <div className="space-y-2">
+                    <label className="text-[10px] text-neutral-600 font-black uppercase tracking-[0.3em] ml-1">Vaše meno</label>
+                    <input name="author" placeholder="MENO" required className="w-full bg-transparent border-b-2 border-neutral-800 py-4 outline-none focus:border-red-600 text-white font-black text-xl placeholder:text-neutral-900 uppercase" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] text-neutral-600 font-black uppercase tracking-[0.3em] ml-1">Hodnotenie</label>
+                    <select name="rating" required className="w-full bg-transparent border-b-2 border-neutral-800 py-4 outline-none focus:border-red-600 text-white font-black text-xl appearance-none cursor-pointer">
+                      <option value="5" className="bg-black text-white">⭐⭐⭐⭐⭐ 5/5</option>
+                      <option value="4" className="bg-black text-white">⭐⭐⭐⭐ 4/5</option>
+                    </select>
+                  </div>
                </div>
-               <textarea name="text" placeholder="VAŠA SKÚSENOSŤ..." required className="w-full bg-neutral-950 border border-neutral-800 p-8 outline-none focus:border-red-600 text-white text-xl font-medium resize-none min-h-[250px]" />
+               <div className="space-y-2">
+                 <label className="text-[10px] text-neutral-600 font-black uppercase tracking-[0.3em] ml-1">Lokalita</label>
+                 <input name="mesto" placeholder="MESTO" className="w-full bg-transparent border-b-2 border-neutral-800 py-4 outline-none focus:border-red-600 text-white font-black text-xl placeholder:text-neutral-900 uppercase" />
+               </div>
+               <div className="space-y-2">
+                 <label className="text-[10px] text-neutral-600 font-black uppercase tracking-[0.3em] ml-1">Vaša skúsenosť</label>
+                 <textarea name="text" placeholder="VAŠA SKÚSENOSŤ..." required className="w-full bg-neutral-950 border border-neutral-800 p-8 outline-none focus:border-red-600 text-white text-xl font-medium resize-none min-h-[250px]" />
+               </div>
             </div>
-
             <div className="flex gap-4 mt-12">
-               <button type="button" onClick={() => setIsFormOpen(false)} className="flex-1 py-5 border border-neutral-800 font-black uppercase text-xs">Zrušiť</button>
-               <button disabled={isSubmitting} type="submit" className="flex-[2] py-5 bg-red-600 text-white font-black uppercase text-xs">Odoslať</button>
+               <button type="button" onClick={() => setIsFormOpen(false)} className="flex-1 py-5 border border-neutral-800 font-black uppercase text-xs hover:bg-neutral-900 transition-all">Zrušiť</button>
+               <button disabled={isSubmitting} type="submit" className="flex-[2] py-5 bg-red-600 text-white font-black uppercase text-xs hover:bg-white hover:text-black transition-all disabled:opacity-50">
+                 {isSubmitting ? "Odosielam..." : "Odoslať"}
+               </button>
             </div>
           </form>
         </div>
