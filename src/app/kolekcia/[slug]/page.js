@@ -96,7 +96,7 @@ export default async function CollectionPage({ params }) {
 
               <div className="pt-6">
                 <Link 
-                  href="/#kontakt" 
+                  href="/kontakt" 
                   className="inline-flex items-center justify-center bg-slate-900 hover:bg-red-600 text-white px-10 py-5 rounded-xl font-black uppercase tracking-widest text-sm transition-all shadow-xl active:scale-95 w-full sm:w-auto"
                 >
                   Mám záujem o realizáciu

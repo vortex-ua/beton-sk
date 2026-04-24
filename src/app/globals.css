@@ -19,82 +19,87 @@
   }
 }
 
+/* ZÁKLADNÝ RESET PRE MAXIMÁLNY VÝKON */
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Odstraňuje konflikt systémového scrollovania s JS knižnicami */
+  overscroll-behavior-y: none; 
 }
-/* 1. Заставляем картинку в лайтбоксе быть на весь экран */
-/* Убираем все лимиты лайтбокса и заставляем фото занимать 100% пространства слайда */
+
+/* OPTIMALIZÁCIA GRAFIKY (GPU) */
+.gpu-optimize, .group {
+  /* Vytvorí novú vrstvu na GPU, ale nepreťažuje ju */
+  transform: translateZ(0); 
+  backface-visibility: hidden;
+  perspective: 1000;
+  /* Hovorí prehliadaču, čo sa bude hýbať, aby sa pripravil */
+  will-change: transform, opacity;
+}
+
+/* OBRÁZKY - CLS & RENDERING */
+img {
+  /* Prehliadač nerieši obrázky, ktoré sú mimo obrazovky */
+  content-visibility: auto;
+  /* Zabraňuje trhaniu pri zmene grayscale/scale */
+  transition: transform 0.3s ease-out, filter 0.3s ease-out !important;
+}
+
+.project-card-image {
+  aspect-ratio: 16 / 9 !important;
+  width: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
+/* LIGHTBOX (YARL) - AGRESÍVNY FIX */
 .yarl__slide_image {
   width: 100% !important;
   height: 100% !important;
   max-width: 100% !important;
   max-height: 100% !important;
-  object-fit: contain !important; /* Фото не обрежется, но займет весь экран */
+  object-fit: contain !important;
 }
 
-/* Убираем внутренние отступы самой библиотеки */
 .yarl__slide {
   padding: 0 !important;
 }
 
-/* Магия для плавности */
-* {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-.snap-x {
-  /* Улучшает производительность скролла в слайдерах */
-  -webkit-overflow-scrolling: touch;
-  scroll-padding: 2rem;
-}
-
-/* Оптимизация тяжелых карточек */
-.group {
-  will-change: transform;
-  backface-visibility: hidden;
-}
-/* 3. Центрируем, если фото меньше экрана */
-.yarl__flex_center {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}/* Гарантируем одинаковый размер карточек в портфолио */
-.project-card-image {
-  aspect-ratio: 16 / 9 !important; /* Или 1 / 1 для квадратов */
-  width: 100% !important;
-  object-fit: cover !important;
-  display: block !important;
-}
-button, 
-[role="button"],
-.embla__button {
+/* TLAČIDLÁ & INTERAKCIA */
+button, [role="button"] {
   cursor: pointer !important;
-  /* Убирает серое выделение при нажатии на старых iOS */
-  -webkit-tap-highlight-color: transparent; 
-  /* Подсказывает браузеру, как обрабатывать касания */
+  -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
-  /* Для старых устройств - обеспечиваем видимость кнопок */
-  -webkit-user-select: none;
   user-select: none;
 }
 
-/* Поддержка backdrop-filter для старых браузеров */
+/* ⚠️ POZOR: BACKDROP BLUR JE ŽRÚT VÝKONU */
+/* Ak chceš 240Hz plynulosť, odporúčam toto nepoužívať na veľké plochy */
+.backdrop-blur-md {
+  background-color: rgba(255, 255, 255, 0.8) !important; /* Záložný plán */
+}
+
 @supports (backdrop-filter: blur(10px)) {
   .backdrop-blur-md {
-    backdrop-filter: blur(12px);
+    /* Ak to musí byť, tak len jemne a na malých plochách */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 }
 
-@supports (-webkit-backdrop-filter: blur(10px)) {
-  .backdrop-blur-md {
-    -webkit-backdrop-filter: blur(12px);
-  }
-}
+/* LAYOUT FIX */
 .layout-wrapper {
   display: grid;
-  grid-template-rows: auto 1fr; /* Первая строка (шапка) сама берет свою высоту, вторая (контент) — всё остальное */
+  grid-template-rows: auto 1fr;
   min-height: 100vh;
+}
+
+/* SLIDER FIX */
+.snap-x {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scroll-padding: 2rem;
 }
