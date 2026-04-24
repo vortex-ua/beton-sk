@@ -1,9 +1,9 @@
+import { prisma } from "@/lib/prisma";
 import About from "@/components/home/About";
 import Services from "@/components/home/Services";
 import Reviews from "@/components/home/Reviews";
 import EditorHeader from "@/components/admin/EditorHeader";
 import { getContent } from "@/actions/adminActions";
-import { prisma } from "@/lib/prisma";
 import Benefits from "@/components/shared/Benefits";
 export const dynamic = 'force-dynamic';
 export default async function EditorPage() {

@@ -1,3 +1,4 @@
+import { prisma } from "@/lib/prisma";
 import Hero from "@/components/home/Hero";
 import About from "@/components/home/About";
 import Services from "@/components/home/Services";
@@ -6,7 +7,6 @@ import { getContent, getCollections } from "@/actions/adminActions"; // Объе
 import StyleGrid from "@/components/home/StyleGrid";
 import PortfolioPreview from "@/components/home/PortfolioPreview";
 export const dynamic = 'force-dynamic';
-
 export default async function Home() {
   const recentProjects = await prisma.project.findMany({ take: 6, orderBy: { createdAt: 'desc' } });
   // 1. ПОЛУЧАЕМ КОЛЛЕКЦИИ (Этого не хватало!)
