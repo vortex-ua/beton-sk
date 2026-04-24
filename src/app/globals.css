@@ -39,7 +39,23 @@ body {
   padding: 0 !important;
 }
 
+/* Магия для плавности */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
+.snap-x {
+  /* Улучшает производительность скролла в слайдерах */
+  -webkit-overflow-scrolling: touch;
+  scroll-padding: 2rem;
+}
+
+/* Оптимизация тяжелых карточек */
+.group {
+  will-change: transform;
+  backface-visibility: hidden;
+}
 /* 3. Центрируем, если фото меньше экрана */
 .yarl__flex_center {
   display: flex !important;
