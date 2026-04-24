@@ -31,13 +31,13 @@ export default function Benefits({ editMode = false, dbData = {} }) {
   const handleBlur = async (field, event) => {
     const newText = event.target.innerText.trim();
     const finalText = newText === "" ? defaultData[field] : newText;
-    
+
     if (finalText !== content[field]) {
       const updated = { ...content, [field]: finalText };
       setContent(updated);
       await saveContent("global", "vyhody", updated);
     } else {
-      event.target.innerText = content[field]; 
+      event.target.innerText = content[field];
     }
   };
 
@@ -53,9 +53,8 @@ export default function Benefits({ editMode = false, dbData = {} }) {
   };
 
   // Дизайн отдельной карточки
-  const cardClasses = `p-6 rounded-2xl flex items-start gap-5 transition-all ${
-    editMode ? 'border-2 border-dashed border-red-300 bg-white' : 'bg-white border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]'
-  }`;
+  const cardClasses = `p-6 rounded-2xl flex items-start gap-5 transition-all ${editMode ? 'border-2 border-dashed border-red-300 bg-white' : 'bg-white border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]'
+    }`;
 
   return (
     <div className="relative">
@@ -67,10 +66,9 @@ export default function Benefits({ editMode = false, dbData = {} }) {
 
       {/* Просторная сетка: 1 колонка на мобилках, 2 колонки на ПК */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6 mt-8">
-        
+
         {/* Блок 1 */}
         <div className={cardClasses}>
-          <div className="p-3.5 bg-slate-50 text-amber-500 rounded-xl shrink-0"><Ruler size={24} strokeWidth={1.5} /></div>
           <div>
             <p {...getEditableProps("b1_title")} className="text-sm font-medium text-slate-500 mb-1">{content.b1_title}</p>
             <p {...getEditableProps("b1_val")} className="font-black text-xl text-slate-900 uppercase tracking-tight">{content.b1_val}</p>
@@ -79,7 +77,6 @@ export default function Benefits({ editMode = false, dbData = {} }) {
 
         {/* Блок 2 */}
         <div className={cardClasses}>
-          <div className="p-3.5 bg-slate-50 text-amber-500 rounded-xl shrink-0"><Lightbulb size={24} strokeWidth={1.5} /></div>
           <div>
             <p {...getEditableProps("b2_title")} className="text-sm font-medium text-slate-500 mb-1">{content.b2_title}</p>
             <p {...getEditableProps("b2_val")} className="font-black text-xl text-slate-900 uppercase tracking-tight">{content.b2_val}</p>
@@ -88,21 +85,18 @@ export default function Benefits({ editMode = false, dbData = {} }) {
 
         {/* Блок 3 */}
         <div className={cardClasses}>
-          <div className="p-3.5 bg-slate-50 text-amber-500 rounded-xl shrink-0"><Calculator size={24} strokeWidth={1.5} /></div>
           <div>
             <p {...getEditableProps("b3_title")} className="text-sm font-medium text-slate-500 mb-1">{content.b3_title}</p>
             <p {...getEditableProps("b3_val")} className="font-black text-xl text-slate-900 uppercase tracking-tight">{content.b3_val}</p>
           </div>
         </div>
-
-        {/* Блок 4 */}
         <div className={cardClasses}>
-          <div className="p-3.5 bg-amber-50 text-amber-600 rounded-xl shrink-0"><Tag size={24} strokeWidth={2} /></div>
           <div>
-            <p {...getEditableProps("b4_title")} className="text-sm font-medium text-amber-600/80 mb-1">{content.b4_title}</p>
-            <p {...getEditableProps("b4_val")} className="font-black text-xl text-amber-600 uppercase tracking-tight">{content.b4_val}</p>
+            <p {...getEditableProps("b4_title")} className="text-sm font-medium text-slate-500 mb-1">{content.b4_title}</p>
+            <p {...getEditableProps("b4_val")} className="font-black text-xl text-slate-900 uppercase tracking-tight">{content.b4_val}</p>
           </div>
         </div>
+
 
       </div>
     </div>

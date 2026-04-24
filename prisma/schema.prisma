@@ -60,3 +60,11 @@ model Project {
   location    String?  // Город (Bratislava, Trnava...)
   createdAt   DateTime @default(now())
 }
+model Review {
+  id        Int      @id @default(autoincrement())
+  author    String   // Имя клиента
+  rating    Int      @default(5) // Оценка (1-5)
+  text      String   // Текст отзыва
+  status    String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  createdAt DateTime @default(now())
+}

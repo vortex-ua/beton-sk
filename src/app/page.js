@@ -9,27 +9,30 @@ import PortfolioPreview from "@/components/home/PortfolioPreview";
 export const dynamic = 'force-dynamic';
 export default async function Home() {
   const recentProjects = await prisma.project.findMany({ take: 6, orderBy: { createdAt: 'desc' } });
-  // 1. ПОЛУЧАЕМ КОЛЛЕКЦИИ (Этого не хватало!)
   const collections = await getCollections();
-  
-  // 2. Получаем данные для блока "О нас"
   const aboutData = await getContent("domov", "domov-o-nas");
-  
-  // 3. Получаем данные для блока "Услуги"
   const servicesData = await getContent("domov", "domov-sluzby");
-  
-  // 4. Получаем данные для блока "Отзывы"
   const reviewsData = await getContent("domov", "domov-recenzie");
+  
+  // Получаем одобренные отзывы
+  const approvedReviews = await prisma.review.findMany({
+    where: { status: 'APPROVED' },
+    orderBy: { createdAt: 'desc' }
+  });
 
   return (
     <main>
       <Hero />
-      {/* Теперь переменная collections определена строкой выше */}
       <StyleGrid collections={collections} />
       <PortfolioPreview projects={recentProjects} />
       <About editMode={false} dbData={aboutData || undefined} />
       <Services editMode={false} dbData={servicesData || undefined} />
-      <Reviews editMode={false} dbData={reviewsData || undefined} /> 
+      {/* Теперь передаем всё в отзывы */}
+      <Reviews 
+        editMode={false} 
+        dbData={reviewsData || undefined}
+        approvedReviews={approvedReviews} 
+      />
     </main>
   );
 }

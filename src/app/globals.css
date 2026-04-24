@@ -77,3 +77,8 @@ button,
     -webkit-backdrop-filter: blur(12px);
   }
 }
+.layout-wrapper {
+  display: grid;
+  grid-template-rows: auto 1fr; /* Первая строка (шапка) сама берет свою высоту, вторая (контент) — всё остальное */
+  min-height: 100vh;
+}
