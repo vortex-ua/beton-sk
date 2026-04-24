@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
@@ -5,100 +6,101 @@ export default function StyleGrid({ collections }) {
   if (!collections || collections.length === 0) return null;
 
   return (
-    <section className="py-32 bg-black text-white overflow-hidden relative border-t border-neutral-900" id="kolekcie">
+    <section className="py-24 bg-white text-black overflow-hidden relative border-t border-black" id="kolekcie">
       
-      {/* BACKGROUND DECO TEXT */}
-      <div className="absolute top-0 right-0 text-[22vw] font-black text-white/[0.02] leading-none select-none pointer-events-none -translate-y-1/4 uppercase">
-        Design
+      {/* ТЕХНИЧЕСКАЯ МАРКИРОВКА (SYSTEM INFO) */}
+      <div className="absolute top-8 left-6 text-[9px] font-mono text-slate-300 uppercase tracking-[0.5em] select-none pointer-events-none">
+        Elite Industrial / Design Catalogue v2.0
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 relative z-10">
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
         
-        {/* HEADER - В едином стиле с остальными секциями */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-24 gap-10 border-l-4 border-red-600 pl-8">
-          <div className="max-w-4xl">
-            <p className="text-red-600 font-black uppercase tracking-[0.5em] text-[9px] mb-4">Katalóg / Estetika a funkčnosť</p>
-            <h2 className="text-5xl md:text-8xl font-black tracking-tighter uppercase leading-[0.8]">
-              Vyberte si <br />
-              <span className="text-neutral-500">Svoj štýl</span>
+        {/* HEADER - Brutalist layout */}
+        <div className="flex flex-col md:flex-row md:items-start justify-between mb-24 gap-12">
+          <div className="space-y-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-[2px] bg-red-600"></div>
+              <span className="text-black text-[10px] font-black uppercase tracking-[0.5em]">Index_02</span>
+            </div>
+            <h2 className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter uppercase leading-[0.75]">
+              Vyberte <br /> Svoj Štýl.
             </h2>
           </div>
-          <p className="text-neutral-500 max-w-xs text-[10px] font-black uppercase tracking-widest leading-relaxed border-l border-neutral-800 pl-6">
-            Každá kolekcia definuje charakter vášho priestoru. Od minimalistického modernizmu po naturálne textúry.
-          </p>
+          
+          <div className="md:max-w-[280px] pt-4">
+            <p className="text-black text-[11px] font-bold uppercase tracking-widest leading-relaxed border-l-4 border-black pl-8 italic">
+              Betónová architektúra v surovom prevedení. Definujeme hranice vášho pozemku s dôrazom na geometriu и statiku.
+            </p>
+          </div>
         </div>
 
-        {/* GRID КОЛЛЕКЦИЙ - Эффект единой плиты (gap-0) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border-t border-l border-neutral-900">
+        {/* GRID КОЛЛЕКЦИЙ - Техно-сетка */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 bg-black gap-px border border-black">
           {collections.map((col, idx) => (
             <Link 
               href={`/kolekcia/${col.slug}`} 
               key={col.id} 
-              className="group relative border-r border-b border-neutral-900 bg-[#0a0a0a] overflow-hidden aspect-[4/5] transition-all duration-500 hover:border-red-600/50"
+              className="group relative bg-white aspect-[3/4] overflow-hidden"
             >
-              {/* ТЕХНИЧЕСКИЙ ИНДЕКС */}
-              <div className="absolute top-8 left-10 z-20 text-[10px] font-mono text-neutral-700 group-hover:text-red-600 transition-colors">
-                // TYPE-0{idx + 1 < 10 ? `0${idx + 1}` : idx + 1}
+              {/* ИНДЕКС МОДЕЛИ */}
+              <div className="absolute top-8 left-8 z-20">
+                <span className="text-[10px] font-black text-black bg-white px-3 py-1 border border-black group-hover:bg-black group-hover:text-white transition-colors duration-500">
+                  MOD-0{idx + 1}
+                </span>
               </div>
 
-              {/* СТРЕЛКА (ВЫЛЕТАЕТ) */}
-              <div className="absolute top-8 right-10 z-20 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
-                <ArrowUpRight size={20} className="text-red-600" />
-              </div>
-
-              {/* ИЗОБРАЖЕНИЕ С ЭФФЕКТАМИ */}
-              <div className="absolute inset-0 overflow-hidden">
+              {/* ИЗОБРАЖЕНИЕ - Grayscale Logic */}
+              <div className="absolute inset-0 grayscale group-hover:grayscale-0 transition-all duration-1000 ease-in-out scale-100 group-hover:scale-110 opacity-90 group-hover:opacity-100">
                 <img
                   src={col.mainImage || "/api/placeholder/800/1000"}
                   alt={col.title}
-                  className="w-full h-full object-cover transition-all duration-1000 scale-100 group-hover:scale-110 opacity-30 group-hover:opacity-60"
+                  className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90"></div>
               </div>
 
-              {/* КОНТЕНТ */}
-              <div className="absolute inset-0 p-10 flex flex-col justify-end">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-[2px] bg-red-600 transform origin-left transition-transform group-hover:scale-x-150"></div>
-                    <span className="text-[9px] font-black text-red-600 uppercase tracking-[0.3em]">
-                      Zobraziť detaily
-                    </span>
-                  </div>
-                  
-                  <h3 className="text-3xl font-black text-white uppercase tracking-tighter leading-none group-hover:translate-x-2 transition-transform duration-500">
+              {/* ТЕКСТОВЫЙ БЛОК - Инженерный выезд */}
+              <div className="absolute bottom-0 left-0 w-full p-10 bg-white translate-y-[calc(100%-85px)] group-hover:translate-y-0 transition-transform duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] border-t border-black">
+                <div className="flex items-center justify-between mb-8">
+                  <h3 className="text-3xl font-black uppercase tracking-tighter leading-none">
                     {col.title}
                   </h3>
-                  
-                  <p className="text-neutral-500 text-[11px] font-bold uppercase tracking-widest leading-relaxed opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
-                    {col.subtitle}
+                  <ArrowUpRight size={28} className="text-black group-hover:text-red-600 transition-colors duration-500" />
+                </div>
+                
+                <div className="space-y-6 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-200">
+                  <div className="h-px w-full bg-slate-100"></div>
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-relaxed">
+                    {col.subtitle || "Technická špecifikácia oplotenia určená pre rezidenčné a priemyselné objekty."}
                   </p>
+                  <div className="flex items-center gap-4">
+                     <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+                     <span className="text-[10px] font-black text-black uppercase tracking-widest">Zobraziť konfiguráciu</span>
+                  </div>
                 </div>
               </div>
-
-              {/* ИНДИКАТОР ВЫБОРА СНИЗУ */}
-              <div className="absolute bottom-0 left-0 w-0 h-1 bg-red-600 group-hover:w-full transition-all duration-700"></div>
             </Link>
           ))}
         </div>
 
-        {/* FOOTER СЕКЦИИ */}
-        <div className="mt-20 flex flex-col md:flex-row items-center justify-between border-t border-neutral-900 pt-10 gap-6">
-            <div className="flex items-center gap-8">
-                <div className="flex flex-col">
-                    <span className="text-red-600 font-black text-2xl leading-none">15+</span>
-                    <span className="text-neutral-600 text-[9px] font-black uppercase tracking-widest mt-1">Rokov praxe</span>
-                </div>
-                <div className="w-px h-8 bg-neutral-800"></div>
-                <div className="flex flex-col">
-                    <span className="text-red-600 font-black text-2xl leading-none">100%</span>
-                    <span className="text-neutral-600 text-[9px] font-black uppercase tracking-widest mt-1">Slovenský betón</span>
-                </div>
+        {/* FOOTER СЕКЦИИ - Data Sheet */}
+        <div className="mt-20 flex flex-col md:flex-row items-center justify-between gap-12 border-b-2 border-black pb-12">
+            <div className="flex gap-16">
+               <div className="flex flex-col">
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-2">Technológia</span>
+                  <span className="text-lg font-black uppercase tracking-tighter">Vibroliaty Betón</span>
+               </div>
+               <div className="flex flex-col">
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-2">Norma</span>
+                  <span className="text-lg font-black uppercase tracking-tighter">STN EN 12839</span>
+               </div>
             </div>
-            <p className="text-neutral-600 text-[9px] font-mono tracking-tighter text-right">
-                // VŠETKY PRÁVA VYHRADENÉ. <br />
-                // ARCHITEKTONICKÉ RIEŠENIA OPLOTENIA.
-            </p>
+            
+            <div className="text-right hidden md:block">
+               <p className="text-[10px] font-mono text-slate-300 leading-tight uppercase">
+                 // System_Check: OK <br />
+                 // Visual_Style: Elite_Industrial
+               </p>
+            </div>
         </div>
       </div>
     </section>

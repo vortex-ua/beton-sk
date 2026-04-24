@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { saveContent } from "@/actions/adminActions";
 import { uploadImage } from "@/actions/uploadActions";
 
@@ -16,6 +16,10 @@ export default function About({ editMode = false, dbData = defaultData }) {
   const [content, setContent] = useState({ ...defaultData, ...dbData });
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    if (dbData) setContent({ ...defaultData, ...dbData });
+  }, [dbData]);
 
   const handleBlur = async (field, event) => {
     const newText = event.target.innerText.trim();
@@ -47,73 +51,61 @@ export default function About({ editMode = false, dbData = defaultData }) {
       contentEditable: true,
       suppressContentEditableWarning: true,
       onBlur: (e) => handleBlur(field, e),
-      // Здесь оставляем только стили для режима редактирования
-      className: "outline outline-2 outline-red-500 bg-red-50/50 cursor-text rounded px-1",
+      className: "outline-none focus:ring-1 focus:ring-slate-900 p-1 transition-all",
       title: "Kliknite pre úpravu"
     };
   };
 
   return (
-    <section id="onas" className={`py-24 bg-white overflow-hidden relative ${editMode ? 'border-4 border-dashed border-red-200' : ''}`}>
+    <section id="onas" className={`py-32 bg-[#F5F5F5] overflow-hidden relative border-t border-slate-100 ${editMode ? 'ring-1 ring-inset ring-red-500' : ''}`}>
       
       {editMode && (
-        <div className="absolute top-0 left-0 bg-red-600 text-white text-xs font-bold px-3 py-1 uppercase rounded-br-lg z-50">
-          Úprava: O NÁS
+        <div className="absolute top-0 left-0 bg-red-600 text-white text-[10px] font-black px-4 py-2 uppercase tracking-widest z-50">
+          Admin / Edit Mode
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-center">
 
-          {/* ТЕКСТОВАЯ ЧАСТЬ */}
-          {/* break-words и whitespace-pre-wrap вынесены в основные классы */}
-          <div className="space-y-8 max-w-full overflow-hidden break-words whitespace-pre-wrap">
-            <div>
+          {/* ТЕКСТОВАЯ ЧАСТЬ (8 колонок на десктопе для воздуха) */}
+          <div className="lg:col-span-7 space-y-12">
+            <div className="border-l border-slate-900 pl-8">
               <h2 
                 {...getEditableProps("hlavnyNadpis")} 
-                className={`text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight uppercase break-words ${editMode ? getEditableProps("hlavnyNadpis").className : ""}`}
+                className="text-4xl md:text-5xl lg:text-6xl font-light text-slate-900 leading-[1.1] tracking-tighter uppercase break-words"
               >
                 {content.hlavnyNadpis}
               </h2>
             </div>
             
-            <div className="space-y-5 text-lg text-slate-600 leading-relaxed break-words">
-              <p 
-                {...getEditableProps("odstavec1")} 
-                className={`break-words ${editMode ? getEditableProps("odstavec1").className : ""}`}
-              >
+            <div className="space-y-8 text-lg font-light text-slate-500 leading-relaxed max-w-2xl">
+              <p {...getEditableProps("odstavec1")} className="break-words">
                 {content.odstavec1}
               </p>
               
-              <p className="break-words">
-                <span 
-                  {...getEditableProps("odstavec2")} 
-                  className={`break-words ${editMode ? getEditableProps("odstavec2").className : ""}`}
-                >
-                  {content.odstavec2}
-                </span>
-                {" "}
+              <div className="flex gap-4 items-start">
+                 <div className="w-8 h-px bg-slate-300 mt-4 shrink-0"></div>
+                 <p {...getEditableProps("odstavec2")} className="break-words italic">
+                   {content.odstavec2}
+                 </p>
+              </div>
               
-              </p>
-              
-              <p 
-                {...getEditableProps("odstavec3")} 
-                className={`break-words ${editMode ? getEditableProps("odstavec3").className : ""}`}
-              >
+              <p {...getEditableProps("odstavec3")} className="break-words">
                 {content.odstavec3}
               </p>
             </div>
           </div>
 
-          {/* КАРТИНКА */}
-          <div className="relative h-[500px] lg:h-[700px] w-full rounded-sm overflow-hidden shadow-2xl group">
+          {/* КАРТИНКА (5 колонок) */}
+          <div className="lg:col-span-5 relative h-[500px] lg:h-[650px] w-full rounded-none overflow-hidden group">
             {editMode && (
                 <div 
                   onClick={() => fileInputRef.current?.click()} 
-                  className="absolute inset-0 bg-black/60 z-20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
+                  className="absolute inset-0 bg-black/40 z-20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer backdrop-blur-sm"
                 >
-                   <span className="text-white font-bold px-6 py-3 border-2 border-white rounded-md">
-                     {isUploading ? "Nahrávam..." : "Zmeniť fotografiu"}
+                   <span className="text-white text-[10px] uppercase tracking-[0.3em] font-black border border-white px-6 py-3">
+                     {isUploading ? "Nahrávam..." : "Vymeniť foto"}
                    </span>
                 </div>
             )}
@@ -122,11 +114,13 @@ export default function About({ editMode = false, dbData = defaultData }) {
 
             <Image
               src={content.obrazok || defaultData.obrazok}
-              alt="Výroba a montáž"
+              alt="Elite Industrial About"
               fill
-              className={`object-cover transition-transform duration-1000 group-hover:scale-105 ${isUploading ? 'opacity-50 blur-sm' : ''}`}
+              className={`object-cover grayscale hover:grayscale-0 transition-all duration-1000 ease-out scale-105 group-hover:scale-100 ${isUploading ? 'opacity-30 blur-md' : ''}`}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+            
+            {/* Тонкая рамка поверх картинки для стиля */}
+            <div className="absolute inset-4 border border-white/20 pointer-events-none"></div>
           </div>
 
         </div>

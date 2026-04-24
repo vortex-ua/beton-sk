@@ -207,3 +207,12 @@ export async function uploadImage(file) {
   const blob = await put(file.name, file, { access: 'public' });
   return blob.url; // Возвращаем https://... ссылку
 }
+export async function deleteAllCollectionsAction() {
+  try {
+    await prisma.collection.deleteMany({});
+    revalidatePath("/admin/editor");
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+}
