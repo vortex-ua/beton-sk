@@ -81,56 +81,34 @@ export default function Services({ editMode = false, dbData = defaultData }) {
   };
 
   // Компонент для отрисовки карточки услуги
-  const ServiceCard = ({ index, titulField, popisField, iconField }) => (
-    <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow relative">
-      
-      {/* Иконка */}
-      <div className="mb-6">
+  const ServiceCard = ({ titulField, popisField, iconField }) => (
+    <div className="group bg-white p-10 rounded-2xl border border-slate-100 transition-all hover:shadow-2xl hover:-translate-y-2">
+      <div className="mb-8 transition-transform group-hover:scale-110 duration-500">
         {iconLibrary[content[iconField]] || <CheckCircle className="text-red-600" size={32} />}
       </div>
-
-      {/* Выпадающий список выбора иконки (виден ТОЛЬКО в админке) */}
-      {editMode && (
-        <div className="absolute top-4 right-4">
-          <select 
-            value={content[iconField]} 
-            onChange={(e) => handleIconChange(iconField, e)}
-            className="text-xs bg-slate-100 border border-slate-300 rounded p-1 cursor-pointer outline-none focus:border-red-500 text-slate-700"
-          >
-            {Object.keys(iconLibrary).map(iconName => (
-              <option key={iconName} value={iconName}>{iconName}</option>
-            ))}
-          </select>
-        </div>
-      )}
-
-      {/* Тексты */}
-      <h3 {...getEditableProps(titulField)} className={`text-xl font-bold text-slate-900 mb-4 uppercase tracking-tight ${getEditableProps(titulField).className || ""}`}>
+      <h3 {...getEditableProps(titulField)} className="text-xl font-black text-slate-900 mb-4 uppercase tracking-tighter">
         {content[titulField]}
       </h3>
-      <p {...getEditableProps(popisField)} className={`text-slate-600 leading-relaxed ${getEditableProps(popisField).className || ""}`}>
+      <p {...getEditableProps(popisField)} className="text-slate-500 leading-relaxed font-medium text-sm">
         {content[popisField]}
       </p>
+      <div className="w-0 group-hover:w-full h-1 bg-red-600 mt-6 transition-all duration-500"></div>
     </div>
   );
 
   return (
-    <section id="sluzby"  className={`py-24 bg-slate-50 relative ${editMode ? 'border-4 border-dashed border-red-200' : ''}`}>
-      {editMode && (
-        <div className="absolute top-0 left-0 bg-red-600 text-white text-xs font-bold px-3 py-1 uppercase rounded-br-lg z-50">
-          Úprava: SLUŽBY
-        </div>
-      )}
-
+    <section id="sluzby" className="py-24 bg-slate-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <div className="text-center mb-20">
-          <h1 {...getEditableProps("hlavnyNadpis")} className={`text-4xl md:text-6xl font-black text-slate-900 mb-4 uppercase ${getEditableProps("hlavnyNadpis").className || ""}`}>
-            {content.hlavnyNadpis}
-          </h1>
-          <p {...getEditableProps("podnadpis")} className={`text-lg text-slate-600 max-w-2xl mx-auto ${getEditableProps("podnadpis").className || ""}`}>
-            {content.podnadpis}
-          </p>
+        {/* ЕДИНЫЙ ЗАГОЛОВОК */}
+        <div className="text-center mb-20 flex flex-col items-center">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-1 bg-red-600"></div>
+            <span className="text-red-500 font-black uppercase tracking-[0.3em] text-xs">Naše služby</span>
+            <div className="w-12 h-1 bg-red-600"></div>
+          </div>
+          <h2 className="text-4xl md:text-7xl font-black text-slate-900 uppercase tracking-tighter leading-none">
+            Kompletný servis
+          </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

@@ -2,51 +2,34 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { saveContent } from "@/actions/adminActions";
 import { submitReview } from "@/actions/reviewActions";
-import { Quote, Plus, Trash2, User, ChevronLeft, ChevronRight } from "lucide-react";
+import { Quote, Plus, Trash2, ChevronLeft, ChevronRight, User } from "lucide-react";
 
 const defaultReviews = [
-  { id: 1, text: "Plot stojí už 8 rokov...", autor: "Martin K.", mesto: "Bratislava" }
+  { id: 1, text: "Plot stojí už 8 rokov a vyzerá ako nový. Žiadne praskliny, žiadne problémy.", autor: "Martin K.", mesto: "Bratislava" }
 ];
 
 export default function Reviews({ editMode = false, dbData, approvedReviews = [] }) {
-  // 1. Состояние для "ручных" отзывов из JSON
   const [staticReviews, setStaticReviews] = useState(dbData?.items || defaultReviews);
-  const [title, setTitle] = useState(dbData?.title || "ČO HOVORIA NAŠI ZÁKAZNÍCI");
-  
-  // Состояния формы
+  const [title, setTitle] = useState(dbData?.title || "HLAS NAŠICH ZÁKAZNÍKOV");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const scrollRef = useRef(null);
 
-  // 2. СИНХРОНИЗАЦИЯ: Обновляем стейт только если данные с сервера реально изменились
-  // Это НЕ вызывает сохранение, только обновляет отображение
   useEffect(() => {
-    if (dbData?.items) {
-      setStaticReviews(dbData.items);
-    }
-    if (dbData?.title) {
-      setTitle(dbData.title);
-    }
+    if (dbData?.items) setStaticReviews(dbData.items);
+    if (dbData?.title) setTitle(dbData.title);
   }, [dbData]);
 
-  // 3. ОБЪЕДИНЕНИЕ: Смешиваем статику и базу прямо во время рендера
   const displayReviews = useMemo(() => {
     const fromDb = approvedReviews.map(r => ({
-      id: `db-${r.id}`,
-      text: r.text,
-      autor: r.author,
-      mesto: 'Overený zákazník',
-      isFromDb: true
+      id: `db-${r.id}`, text: r.text, autor: r.author, mesto: 'Overený zákazník', isFromDb: true
     }));
     return [...staticReviews, ...fromDb];
   }, [staticReviews, approvedReviews]);
 
-  // 4. СОХРАНЕНИЕ: Вызывается ТОЛЬКО по клику или потере фокуса
   const saveAll = async (newReviews, newTitle) => {
-    // ВАЖНО: здесь нет await внутри useEffect, только ручной вызов
     await saveContent("domov", "domov-recenzie", { 
-      items: newReviews || staticReviews, 
-      title: newTitle || title 
+      items: newReviews || staticReviews, title: newTitle || title 
     });
   };
 
@@ -56,7 +39,7 @@ export default function Reviews({ editMode = false, dbData, approvedReviews = []
     const formData = new FormData(e.target);
     const res = await submitReview(formData);
     if (res.success) {
-      alert("Ďakujeme! Vaša recenzia bola odoslaná na schválenie.");
+      alert("Ďakujeme! Ваша recenzia bola odoslaná na schválenie.");
       setIsFormOpen(false);
       e.target.reset();
     }
@@ -71,136 +54,165 @@ export default function Reviews({ editMode = false, dbData, approvedReviews = []
     }
   };
 
+  const getEditableProps = (field) => {
+    if (!editMode) return {};
+    return {
+      contentEditable: true,
+      suppressContentEditableWarning: true,
+      className: "outline-none focus:ring-2 focus:ring-red-600 rounded hover:bg-white/5 px-1",
+    };
+  };
+
   return (
-    <section className={`py-24 bg-[#0f172a] text-white overflow-hidden relative ${editMode ? 'border-y-2 border-red-500/30' : ''}`}>
+    <section className="py-32 bg-black text-white overflow-hidden relative border-t border-neutral-900 selection:bg-red-900selection:text-red-100">
+      
+      {/* BACKGROUND DECO TEXT - Очень тонко, еле заметно */}
+      <div className="absolute top-0 right-0 text-[25vw] font-black text-[#0d0d0d] leading-none select-none pointer-events-none -translate-y-1/3 uppercase">
+        Clients
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 relative z-10">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-          <div className="max-w-2xl">
+        
+        {/* HEADER - Строгий, архитектурный */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-24 gap-10 border-l-4 border-red-600 pl-8">
+          <div className="max-w-4xl">
+            <p className="text-red-600 font-black uppercase tracking-[0.5em] text-[9px] mb-4">Referencie / Realizácie v čase</p>
             <h2 
-              contentEditable={editMode}
-              suppressContentEditableWarning
-              onBlur={(e) => { 
-                const newTitle = e.target.innerText;
-                setTitle(newTitle); 
-                saveAll(staticReviews, newTitle); 
-              }}
-              className="text-4xl md:text-6xl font-black tracking-tight uppercase outline-none"
+              {...getEditableProps("title")}
+              onBlur={(e) => { const nt = e.target.innerText; setTitle(nt); saveAll(staticReviews, nt); }}
+              className="text-5xl md:text-8xl font-black tracking-tighter uppercase leading-[0.8]"
             >
               {title}
             </h2>
           </div>
           
-          <div className="flex gap-4 items-center">
+          <div className="flex gap-3 items-center shrink-0">
             {!editMode && (
-              <button onClick={() => setIsFormOpen(true)} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-6 py-3 rounded-full font-bold border border-white/10 transition-all text-sm shrink-0">
-                <Plus size={18} className="text-red-500" /> Napísať recenziu
-              </button>
-            )}
-            {editMode && (
               <button 
-                onClick={() => {
-                  const newReview = { id: Date.now(), text: "Nová recenzia...", autor: "Meno", mesto: "Mesto" };
-                  const updated = [...staticReviews, newReview];
-                  setStaticReviews(updated);
-                  saveAll(updated);
-                }} 
-                className="flex items-center gap-2 bg-red-600 hover:bg-red-700 px-5 py-2.5 rounded-full font-bold transition-all text-sm shrink-0"
+                onClick={() => setIsFormOpen(true)} 
+                className="group bg-white text-black hover:bg-red-600 hover:text-white px-8 py-5 rounded-none font-black uppercase tracking-widest text-[10px] transition-all active:scale-95 shadow-[6px_6px_0px_0px_rgba(220,38,38,1)] hover:shadow-none"
               >
-                <Plus size={18} /> Pridať recenziu
+                Pridať referenciu
               </button>
             )}
-            <div className="flex gap-2">
-                <button onClick={() => scroll('left')} className="p-3 rounded-full border border-slate-700 hover:bg-slate-800 transition-colors"><ChevronLeft size={20} /></button>
-                <button onClick={() => scroll('right')} className="p-3 rounded-full border border-slate-700 hover:bg-slate-800 transition-colors"><ChevronRight size={20} /></button>
+            <div className="flex gap-1">
+                <button onClick={() => scroll('left')} className="p-5 bg-neutral-950 border border-neutral-800 hover:bg-red-600 hover:border-red-600 transition-all">
+                    <ChevronLeft size={20} className="text-neutral-500 hover:text-white"/>
+                </button>
+                <button onClick={() => scroll('right')} className="p-5 bg-neutral-950 border border-neutral-800 hover:bg-red-600 hover:border-red-600 transition-all">
+                    <ChevronRight size={20} className="text-neutral-500 hover:text-white" />
+                </button>
             </div>
           </div>
         </div>
 
-        <div ref={scrollRef} className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-12 custom-scrollbar cursor-grab active:cursor-grabbing" style={{ scrollBehavior: 'smooth' }}>
-          <div className="min-w-[1px] h-1 shrink-0"></div>
-          
-          {displayReviews.map((rev) => (
-            <div key={rev.id} className="min-w-[320px] md:min-w-[450px] snap-center bg-slate-800/40 backdrop-blur-md p-8 md:p-10 rounded-[2.5rem] border border-white/5 flex flex-col relative">
-              
-              {editMode && !rev.isFromDb && (
-                <button 
-                  onClick={() => {
-                    if (confirm("Vymazať?")) {
-                      const updated = staticReviews.filter(r => r.id !== rev.id);
-                      setStaticReviews(updated);
-                      saveAll(updated);
-                    }
-                  }} 
-                  className="absolute top-6 right-6 text-slate-500 hover:text-red-500 transition-colors"
-                >
-                  <Trash2 size={20} />
-                </button>
-              )}
-
-              <Quote className="text-red-600 mb-8 opacity-40" size={48} />
-              
-              <p 
-                contentEditable={editMode && !rev.isFromDb}
-                suppressContentEditableWarning
-                onBlur={(e) => { 
-                    const updated = staticReviews.map(r => r.id === rev.id ? { ...r, text: e.target.innerText } : r);
-                    setStaticReviews(updated);
-                    saveAll(updated);
-                }}
-                className="text-lg md:text-xl text-slate-200 leading-relaxed mb-10 font-light italic outline-none"
-              >
-                {rev.text}
-              </p>
-
-              <div className="mt-auto flex items-center gap-4">
-                <div className="w-14 h-14 bg-gradient-to-br from-slate-700 to-slate-800 rounded-2xl flex items-center justify-center text-slate-400 border border-white/5 text-xl font-bold uppercase">
-                   {rev.autor[0]}
+        {/* SLIDER */}
+        <div 
+          ref={scrollRef} 
+          className="grid grid-flow-col auto-cols-[100%] md:auto-cols-[600px] gap-0 overflow-x-auto snap-x snap-mandatory pb-12 custom-scrollbar no-scrollbar h-full" 
+          style={{ scrollBehavior: 'smooth' }}
+        >
+          {displayReviews.map((rev, idx) => (
+            <div key={rev.id} className="snap-center p-2 group h-full">
+              <div className="bg-[#0a0a0a] h-full p-12 md:p-16 relative border border-neutral-800 rounded-none transition-all duration-500 group-hover:border-red-600/60 flex flex-col justify-between">
+                
+                {/* ТЕХНИЧЕСКИЙ НОМЕР */}
+                <div className="absolute top-6 left-10 text-xs font-mono text-neutral-800 group-hover:text-red-600/40 transition-colors pointer-events-none">
+                  // RFRNC-{idx + 1 < 10 ? `0${idx + 1}` : idx + 1}
                 </div>
-                <div>
-                  <div 
+
+                {editMode && !rev.isFromDb && (
+                  <button onClick={() => { if(confirm("Zmazať?")){ const u = staticReviews.filter(r => r.id !== rev.id); setStaticReviews(u); saveAll(u); } }}
+                    className="absolute top-8 right-8 text-slate-700 hover:text-red-500 transition-colors z-20">
+                    <Trash2 size={20} />
+                  </button>
+                )}
+
+                <div className="relative z-10 space-y-12">
+                  <Quote className="text-red-600" size={36} strokeWidth={1.5} />
+                  
+                  <p 
+                    className="text-xl md:text-3xl font-light text-slate-100 leading-snug tracking-tight outline-none italic"
                     contentEditable={editMode && !rev.isFromDb}
                     suppressContentEditableWarning
-                    onBlur={(e) => {
-                        const updated = staticReviews.map(r => r.id === rev.id ? { ...r, autor: e.target.innerText } : r);
-                        setStaticReviews(updated);
-                        saveAll(updated);
+                    onBlur={(e) => { 
+                      const u = staticReviews.map(r => r.id === rev.id ? { ...r, text: e.target.innerText } : r); 
+                      setStaticReviews(u); saveAll(u); 
                     }}
-                    className="font-bold text-white uppercase tracking-widest text-sm outline-none"
                   >
-                    {rev.autor}
+                    "{rev.text}"
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-6 pt-10 border-t border-neutral-900 mt-12">
+                  <div className="w-16 h-16 bg-neutral-950 rounded-none flex items-center justify-center text-red-600 border border-neutral-800 text-3xl font-black shadow-inner">
+                    <User size={30} strokeWidth={1}/>
                   </div>
-                  <div className="text-red-500 text-[10px] font-black uppercase tracking-[0.2em] mt-1">{rev.mesto}</div>
+                  <div>
+                    <div 
+                      className="font-black text-white uppercase tracking-tighter text-2xl outline-none"
+                      contentEditable={editMode && !rev.isFromDb}
+                      suppressContentEditableWarning
+                      onBlur={(e) => { 
+                        const u = staticReviews.map(r => r.id === rev.id ? { ...r, autor: e.target.innerText } : r); 
+                        setStaticReviews(u); saveAll(u); 
+                      }}
+                    >
+                      {rev.autor}
+                    </div>
+                    <div className="text-red-600 text-[10px] font-black uppercase tracking-[0.4em] mt-1 border border-red-600/30 px-2 py-0.5 w-fit">
+                      {rev.mesto}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           ))}
-          <div className="min-w-[1px] h-1 shrink-0"></div>
         </div>
       </div>
 
-      {/* Модальное окно */}
+      {/* FORM MODAL - Elite Industrial Style */}
       {isFormOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-sm">
-          <form onSubmit={handleClientSubmit} className="bg-slate-800 p-8 rounded-[2.5rem] border border-white/10 w-full max-w-md shadow-2xl text-white">
-            <h3 className="text-2xl font-bold mb-6 uppercase tracking-tight">Vaša recenzia</h3>
-            <div className="space-y-4">
-              <input name="author" placeholder="Vaše meno" required className="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-red-500 transition-colors" />
-              <select name="rating" className="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-red-500 transition-colors">
-                <option value="5" className="bg-slate-800">⭐⭐⭐⭐⭐ (5/5)</option>
-                <option value="4" className="bg-slate-800">⭐⭐⭐⭐ (4/5)</option>
-                <option value="3" className="bg-slate-800">⭐⭐⭐ (3/5)</option>
-              </select>
-              <textarea name="text" placeholder="Vaša skúsenosť..." required className="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-red-500 transition-colors h-32 text-white" />
-              <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => setIsFormOpen(false)} className="flex-1 py-4 font-bold text-slate-400 hover:text-white transition-colors">Zrušiť</button>
-                <button disabled={isSubmitting} type="submit" className="flex-1 py-4 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-bold transition-all disabled:opacity-50 shadow-lg shadow-red-600/20">
-                  {isSubmitting ? "Odosielam..." : "Odoslať"}
-                </button>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/98 backdrop-blur-md shadow-2xl">
+          <form onSubmit={handleClientSubmit} className="bg-[#050505] p-12 md:p-16 border-2 border-white w-full max-w-2xl shadow-[20px_20px_0px_0px_rgba(220,38,38,1)]">
+            <div className="flex items-center justify-between mb-12 pb-6 border-b-2 border-white/10">
+                <h3 className="text-4xl font-black uppercase tracking-tighter text-white">Pridať referenciu</h3>
+                <span className="text-[9px] font-mono text-slate-700 tracking-widest">// NEW_ENTRY</span>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10">
+              <div className="space-y-3">
+                <label className="text-[10px] font-black uppercase tracking-[.4em] text-slate-500 ml-1">Meno zákazníka</label>
+                <input name="author" placeholder="Meno a Priezvisko" required className="w-full bg-black border border-neutral-800 p-5 outline-none focus:border-red-600 transition-all text-white placeholder:text-slate-800 font-bold text-sm rounded-none" />
               </div>
+              <div className="space-y-3">
+                <label className="text-[10px] font-black uppercase tracking-[.4em] text-slate-500 ml-1">Vaše hodnotenie</label>
+                <select name="rating" className="w-full bg-black border border-neutral-800 p-5 outline-none focus:border-red-600 transition-all text-white font-bold cursor-pointer appearance-none rounded-none uppercase text-sm">
+                  <option value="5" className="bg-slate-900">⭐⭐⭐⭐⭐ 5/5 (Vynikajúce)</option>
+                  <option value="4" className="bg-slate-900">⭐⭐⭐⭐ 4/5 (Veľmi dobré)</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="space-y-3 mb-12">
+              <label className="text-[10px] font-black uppercase tracking-[.4em] text-slate-500 ml-1">Vaša skúsenosť / Popis realizácie</label>
+              <textarea name="text" placeholder="Sem napíšte vaše hodnotenie, ako ste boli spokojní so zameraním, montážou и výsledkom..." required className="w-full bg-black border border-neutral-800 p-5 outline-none focus:border-red-600 transition-all h-36 text-white placeholder:text-slate-800 font-medium resize-none text-sm rounded-none" />
+            </div>
+
+            <div className="flex gap-6 pt-6 border-t border-white/10">
+              <button type="button" onClick={() => setIsFormOpen(false)} className="flex-1 py-5 font-black text-slate-500 hover:text-white uppercase tracking-widest text-[10px] transition-colors border border-neutral-800 rounded-none active:scale-95">Zrušiť</button>
+              <button disabled={isSubmitting} type="submit" className="flex-[2] py-5 bg-red-600 hover:bg-white hover:text-black text-white font-black uppercase tracking-widest text-[10px] transition-all disabled:opacity-50 rounded-none shadow-lg active:scale-95 shadow-red-600/10">
+                {isSubmitting ? "Odosielam dáta..." : "Odoslať na overenie"}
+              </button>
             </div>
           </form>
         </div>
       )}
+
+      <style dangerouslySetInnerHTML={{__html: `
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      `}} />
     </section>
   );
 }
