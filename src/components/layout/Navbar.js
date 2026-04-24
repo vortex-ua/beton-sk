@@ -44,11 +44,12 @@ const Navbar = () => {
           <div className="md:hidden flex items-center">
             <button
               type="button"
+              className="relative z-[100] p-2 text-slate-700" // Высокий z-index
               onClick={() => setIsOpen(!isOpen)}
-              className="relative z-[999] p-2" // Максимальный приоритет
-              style={{ cursor: 'pointer' }}   // Принудительно для старых iOS
+              aria-expanded={isOpen}
             >
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
+              {/* Вместо сложных анимаций Framer Motion, для теста используй просто иконки */}
+              {isOpen ? <X size={28} /> : <Menu size={28} />}
             </button>
           </div>
         </div>
