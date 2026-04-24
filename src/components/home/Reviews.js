@@ -2,9 +2,9 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { saveContent } from "@/actions/adminActions";
 import { submitReview } from "@/actions/reviewActions";
-import { 
-  Quote, Plus, Trash2, ChevronLeft, ChevronRight, 
-  User, X, Star, Check 
+import {
+  Quote, Plus, Trash2, ChevronLeft, ChevronRight,
+  User, X, Star, Check
 } from "lucide-react";
 
 const defaultReviews = [
@@ -71,11 +71,11 @@ export default function Reviews({ editMode = false, dbData, approvedReviews = []
   return (
     <section className="py-24 bg-black text-white overflow-hidden relative border-t border-neutral-900 font-sans">
       <div className="max-w-7xl mx-auto px-4 relative z-10">
-        
+
         {/* HEADER */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-10 border-l-4 border-red-600 pl-8">
           <div className="max-w-4xl overflow-hidden">
-            <h2 
+            <h2
               contentEditable={editMode}
               suppressContentEditableWarning
               onBlur={(e) => { const nt = e.target.innerText; setTitle(nt); saveAll(staticReviews, nt); }}
@@ -84,15 +84,15 @@ export default function Reviews({ editMode = false, dbData, approvedReviews = []
               {title}
             </h2>
           </div>
-          
+
           <div className="flex gap-1 shrink-0">
             {!editMode && (
               <button onClick={() => setIsFormOpen(true)} className="bg-white text-black hover:bg-red-600 hover:text-white px-6 py-4 font-black uppercase tracking-widest text-[10px] transition-all mr-4">
                 Pridať
               </button>
             )}
-            <button onClick={() => scroll('left')} className="p-4 bg-neutral-900 border border-neutral-800 hover:bg-red-600 transition-all"><ChevronLeft size={20}/></button>
-            <button onClick={() => scroll('right')} className="p-4 bg-neutral-900 border border-neutral-800 hover:bg-red-600 transition-all"><ChevronRight size={20}/></button>
+            <button onClick={() => scroll('left')} className="p-4 bg-neutral-900 border border-neutral-800 hover:bg-red-600 transition-all"><ChevronLeft size={20} /></button>
+            <button onClick={() => scroll('right')} className="p-4 bg-neutral-900 border border-neutral-800 hover:bg-red-600 transition-all"><ChevronRight size={20} /></button>
           </div>
         </div>
 
@@ -127,7 +127,7 @@ export default function Reviews({ editMode = false, dbData, approvedReviews = []
       {expandedReview && (
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/95 backdrop-blur-xl" onClick={() => setExpandedReview(null)}></div>
-          <div 
+          <div
             className="relative z-10 w-full md:w-1/2 bg-black border border-neutral-800 flex flex-col max-h-[85vh] shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
@@ -156,46 +156,81 @@ export default function Reviews({ editMode = false, dbData, approvedReviews = []
       {isFormOpen && (
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/95 backdrop-blur-xl" onClick={() => setIsFormOpen(false)}></div>
-          <form 
+          <form
             onSubmit={handleClientSubmit}
-            className="relative z-10 w-full md:w-1/2 bg-black border border-white p-8 md:p-16 flex flex-col max-h-[90vh] overflow-y-auto overflow-x-hidden no-scrollbar shadow-[25px_25px_0px_0px_rgba(220,38,38,1)]"
             onClick={(e) => e.stopPropagation()}
+            className="relative z-10 w-full md:w-1/2 bg-black border border-white p-8 md:p-12 flex flex-col h-auto shadow-[25px_25px_0px_0px_rgba(220,38,38,1)] overflow-hidden"
           >
-            <h3 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-white mb-12">Napísať <br/><span className="text-red-600">Recenziu</span></h3>
-            <div className="space-y-8">
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-2">
-                    <label className="text-[10px] text-neutral-600 font-black uppercase tracking-[0.3em] ml-1">Vaše meno</label>
-                    <input name="author" placeholder="MENO" required className="w-full bg-transparent border-b-2 border-neutral-800 py-4 outline-none focus:border-red-600 text-white font-black text-xl placeholder:text-neutral-900 uppercase" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] text-neutral-600 font-black uppercase tracking-[0.3em] ml-1">Hodnotenie</label>
-                    <select name="rating" required className="w-full bg-transparent border-b-2 border-neutral-800 py-4 outline-none focus:border-red-600 text-white font-black text-xl appearance-none cursor-pointer">
-                      <option value="5" className="bg-black text-white">⭐⭐⭐⭐⭐ 5/5</option>
-                      <option value="4" className="bg-black text-white">⭐⭐⭐⭐ 4/5</option>
-                    </select>
-                  </div>
-               </div>
-               <div className="space-y-2">
-                 <label className="text-[10px] text-neutral-600 font-black uppercase tracking-[0.3em] ml-1">Lokalita</label>
-                 <input name="mesto" placeholder="MESTO" className="w-full bg-transparent border-b-2 border-neutral-800 py-4 outline-none focus:border-red-600 text-white font-black text-xl placeholder:text-neutral-900 uppercase" />
-               </div>
-               <div className="space-y-2">
-                 <label className="text-[10px] text-neutral-600 font-black uppercase tracking-[0.3em] ml-1">Vaša skúsenosť</label>
-                 <textarea name="text" placeholder="VAŠA SKÚSENOSŤ..." required className="w-full bg-neutral-950 border border-neutral-800 p-8 outline-none focus:border-red-600 text-white text-xl font-medium resize-none min-h-[250px]" />
-               </div>
+            <h3 className="text-3xl md:text-5xl font-black uppercase tracking-tighter text-white mb-8">
+              Napísať <br /><span className="text-red-600">Recenziu</span>
+            </h3>
+
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] text-neutral-600 font-black uppercase tracking-[0.3em] ml-1">Vaše meno</label>
+                  <input
+                    name="author"
+                    placeholder="MENO"
+                    required
+                    className="w-full bg-transparent border-b-2 border-neutral-800 py-3 outline-none focus:border-red-600 text-white font-black text-xl placeholder:text-neutral-900 uppercase transition-colors"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] text-neutral-600 font-black uppercase tracking-[0.3em] ml-1">Hodnotenie</label>
+                  <select
+                    name="rating"
+                    required
+                    className="w-full bg-transparent border-b-2 border-neutral-800 py-3 outline-none focus:border-red-600 text-white font-black text-xl appearance-none cursor-pointer"
+                  >
+                    <option value="5" className="bg-black text-white">⭐⭐⭐⭐⭐ 5/5</option>
+                    <option value="4" className="bg-black text-white">⭐⭐⭐⭐ 4/5</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] text-neutral-600 font-black uppercase tracking-[0.3em] ml-1">Lokalita</label>
+                <input
+                  name="mesto"
+                  placeholder="MESTO"
+                  className="w-full bg-transparent border-b-2 border-neutral-800 py-3 outline-none focus:border-red-600 text-white font-black text-xl placeholder:text-neutral-900 uppercase transition-colors"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] text-neutral-600 font-black uppercase tracking-[0.3em] ml-1">Vaša skúsenosť</label>
+                <textarea
+                  name="text"
+                  placeholder="VAŠA SKÚSENOSŤ..."
+                  required
+                  className="w-full bg-neutral-950 border border-neutral-800 p-6 outline-none focus:border-red-600 text-white text-lg font-medium resize-none min-h-[150px] transition-colors"
+                ></textarea>
+              </div>
             </div>
-            <div className="flex gap-4 mt-12">
-               <button type="button" onClick={() => setIsFormOpen(false)} className="flex-1 py-5 border border-neutral-800 font-black uppercase text-xs hover:bg-neutral-900 transition-all">Zrušiť</button>
-               <button disabled={isSubmitting} type="submit" className="flex-[2] py-5 bg-red-600 text-white font-black uppercase text-xs hover:bg-white hover:text-black transition-all disabled:opacity-50">
-                 {isSubmitting ? "Odosielam..." : "Odoslať"}
-               </button>
+
+            <div className="flex gap-4 mt-10">
+              <button
+                type="button"
+                onClick={() => setIsFormOpen(false)}
+                className="flex-1 py-4 border border-neutral-800 font-black uppercase text-xs hover:bg-neutral-900 transition-all"
+              >
+                Zrušiť
+              </button>
+              <button
+                disabled={isSubmitting}
+                type="submit"
+                className="flex-[2] py-4 bg-red-600 text-white font-black uppercase text-xs hover:bg-white hover:text-black transition-all disabled:opacity-50"
+              >
+                {isSubmitting ? "Odosielam..." : "Odoslať"}
+              </button>
             </div>
           </form>
         </div>
       )}
 
-      <style dangerouslySetInnerHTML={{__html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .custom-scrollbar-red::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar-red::-webkit-scrollbar-track { background: transparent; }
