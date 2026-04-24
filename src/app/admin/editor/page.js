@@ -5,7 +5,7 @@ import EditorHeader from "@/components/admin/EditorHeader";
 import { getContent } from "@/actions/adminActions";
 import { prisma } from "@/lib/prisma";
 import Benefits from "@/components/shared/Benefits";
-
+export const dynamic = 'force-dynamic';
 export default async function EditorPage() {
   // 1. ПОЛУЧАЕМ ДАННЫЕ БЕЗ ДУБЛИКАТОВ
   const collections = await prisma.collection.findMany({ orderBy: { id: 'asc' } });
