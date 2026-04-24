@@ -36,7 +36,7 @@ export default function PortfolioPreview({ projects }) {
                   /* Если картинки нет, показываем красивую заглушку */
                   <span className="text-slate-400 font-medium text-sm">Bez obrázka</span>
                 )}
-                <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute inset-0 bg-black/10 opacity-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-500"></div>
               </div>
               <div>
                 <span className="text-xs font-bold text-amber-500 uppercase tracking-widest">{project.category}</span>

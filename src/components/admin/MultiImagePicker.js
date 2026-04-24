@@ -58,7 +58,7 @@ export default function MultiImagePicker({ defaultValue = [] }) {
             <button
               type="button"
               onClick={() => removeImage(index)}
-              className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+              className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shadow-lg active:opacity-100"
             >
               <X size={14} />
             </button>

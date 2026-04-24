@@ -112,7 +112,7 @@ export default function Reviews({ editMode = false, dbData }) {
               {editMode && (
                 <button 
                   onClick={() => deleteReview(rev.id)}
-                  className="absolute top-6 right-6 text-slate-500 hover:text-red-500 transition-colors"
+                  className="absolute top-6 right-6 text-slate-500 hover:text-red-500 active:text-red-600 transition-colors opacity-100"
                 >
                   <Trash2 size={20} />
                 </button>

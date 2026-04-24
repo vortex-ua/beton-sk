@@ -52,3 +52,28 @@ body {
   object-fit: cover !important;
   display: block !important;
 }
+button, 
+[role="button"],
+.embla__button {
+  cursor: pointer !important;
+  /* Убирает серое выделение при нажатии на старых iOS */
+  -webkit-tap-highlight-color: transparent; 
+  /* Подсказывает браузеру, как обрабатывать касания */
+  touch-action: manipulation;
+  /* Для старых устройств - обеспечиваем видимость кнопок */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Поддержка backdrop-filter для старых браузеров */
+@supports (backdrop-filter: blur(10px)) {
+  .backdrop-blur-md {
+    backdrop-filter: blur(12px);
+  }
+}
+
+@supports (-webkit-backdrop-filter: blur(10px)) {
+  .backdrop-blur-md {
+    -webkit-backdrop-filter: blur(12px);
+  }
+}

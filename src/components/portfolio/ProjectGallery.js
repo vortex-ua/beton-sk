@@ -9,7 +9,8 @@ export default function ProjectGallery({ images, title }) {
     const [emblaRef, emblaApi] = useEmblaCarousel({
         align: "start",
         loop: true,
-        slidesToScroll: 1
+        slidesToScroll: 1,
+        skipSnaps: false // Добавили для более четкой фиксации
     });
     const [index, setIndex] = useState(-1);
 
@@ -35,26 +36,31 @@ export default function ProjectGallery({ images, title }) {
                 </div>
             </div>
 
-            {/* КА Carousel: Все карточки ОДИНАКОВОГО размера */}
+            {/* Carousel */}
             <div className="overflow-hidden cursor-grab active:cursor-grabbing" ref={emblaRef}>
-                <div className="flex gap-4">
+                {/* ИЗМЕНЕНИЕ ТУТ: Убрали gap-4, добавили -ml-4. 
+                   Это компенсирует отступ самого первого слайда.
+                */}
+                <div className="flex -ml-4">
                     {images.map((src, i) => (
                         <div
                             key={i}
-                            className="flex-[0_0_85%] md:flex-[0_0_45%] lg:flex-[0_0_31%] min-w-0"
+                            /* ИЗМЕНЕНИЕ ТУТ: Добавили pl-4. 
+                               Теперь отступ — это часть слайда, и при loop он не исчезнет.
+                            */
+                            className="flex-[0_0_85%] md:flex-[0_0_45%] lg:flex-[0_0_31%] min-w-0 pl-4 relative group"
                         >
-                            {/* aspect-video (16:9) гарантирует, что все превью будут одной высоты и ширины */}
-                            <div className="relative aspect-video rounded-xl overflow-hidden shadow-md bg-slate-200 group">
+                            <div className="relative aspect-video rounded-xl overflow-hidden shadow-md bg-slate-200">
                                 <img
                                     src={src}
                                     alt={`${title} - ${i + 1}`}
-                                    className="project-card-image w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                 />
                                 <button
                                     onClick={() => setIndex(i)}
-                                    className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center text-white"
+                                    className="absolute inset-0 bg-black/40 opacity-0 sm:opacity-0 sm:group-hover:opacity-100 active:opacity-100 transition-all duration-300 flex items-center justify-center text-white"
                                 >
-                                    <div className="bg-white/10 backdrop-blur-md p-4 rounded-full border border-white/20 transform translate-y-4 group-hover:translate-y-0 transition-transform">
+                                    <div className="bg-white/10 p-4 rounded-full border border-white/20 transform translate-y-4 sm:group-hover:translate-y-0 active:translate-y-0 transition-transform" style={{ WebkitBackdropFilter: 'blur(10px)', backdropFilter: 'blur(10px)' }}>
                                         <Maximize2 size={28} />
                                     </div>
                                 </button>
@@ -64,7 +70,7 @@ export default function ProjectGallery({ images, title }) {
                 </div>
             </div>
 
-            {/* Полноэкранный просмотр: Адаптация под экран */}
+            {/* Lightbox остается без изменений, он у тебя уже идеальный */}
             <Lightbox
                 index={index}
                 open={index >= 0}
@@ -77,7 +83,6 @@ export default function ProjectGallery({ images, title }) {
                     imageFit: "contain",
                 }}
                 render={{
-                    // Упрощенный рендер без лишних div и padding
                     slide: ({ slide }) => (
                         <img
                             src={slide.src}
