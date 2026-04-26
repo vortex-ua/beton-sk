@@ -6,19 +6,18 @@ import {
   Quote, ChevronLeft, ChevronRight, X, Star
 } from "lucide-react";
 
-const defaultReviews = [
-  { id: 1, text: "Plot stojí už 8 rokov a vyzerá ako nový. Žiadne praskliny, žiadne problémy. Maximálna spokojnosť s prístupom aj montážou.", autor: "Martin K.", mesto: "Bratislava", rating: 5 }
-];
+// 1. Убрали Martin K. из дефолтных значений
+const defaultReviews = [];
 
 export default function Reviews({ editMode = false, dbData, approvedReviews = [] }) {
-  const [staticReviews, setStaticReviews] = useState(dbData?.items || defaultReviews);
+  // Оставляем только заголовок как статический контент
   const [title, setTitle] = useState(dbData?.title || "Recenzie našich klientov");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [expandedReview, setExpandedReview] = useState(null);
   const scrollRef = useRef(null);
 
-  // Классическая блокировка body
+  // Блокировка скролла при открытых модалках
   useEffect(() => {
     if (expandedReview || isFormOpen) {
       document.body.style.overflow = 'hidden';
@@ -27,26 +26,26 @@ export default function Reviews({ editMode = false, dbData, approvedReviews = []
       document.body.style.overflow = '';
       document.documentElement.style.overflow = '';
     }
-    return () => {
-      document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
-    };
   }, [expandedReview, isFormOpen]);
 
   useEffect(() => {
-    if (dbData?.items) setStaticReviews(dbData.items);
     if (dbData?.title) setTitle(dbData.title);
   }, [dbData]);
 
+  // 2. ФИКС: Теперь отображаем ТОЛЬКО отзывы из базы модерации (approvedReviews)
   const displayReviews = useMemo(() => {
-    const fromDb = approvedReviews.map(r => ({
-      id: `db-${r.id}`, text: r.text, autor: r.author, mesto: 'Overený zákazník', rating: r.rating || 5, isFromDb: true
+    return approvedReviews.map(r => ({
+      id: `db-${r.id}`, 
+      text: r.text, 
+      autor: r.author, 
+      mesto: 'Overený zákazník', 
+      rating: r.rating || 5
     }));
-    return [...staticReviews, ...fromDb];
-  }, [staticReviews, approvedReviews]);
+  }, [approvedReviews]);
 
-  const saveAll = async (newReviews, newTitle) => {
-    await saveContent("domov", "domov-recenzie", { items: newReviews || staticReviews, title: newTitle || title });
+  // Сохраняем только заголовок (статические отзывы больше не пишем в БД Content)
+  const saveTitle = async (newTitle) => {
+    await saveContent("domov", "domov-recenzie", { items: [], title: newTitle });
   };
 
   const handleClientSubmit = async (e) => {
@@ -77,16 +76,8 @@ export default function Reviews({ editMode = false, dbData, approvedReviews = []
     }
   };
 
-  // ФУНКЦИИ ДЛЯ БЛОКИРОВКИ СКРОЛЛА
-  const preventScroll = (e) => {
-    // Блокируем скролл на затемненном фоне
-    e.preventDefault();
-  };
-
-  const stopScrollPropagation = (e) => {
-    // Останавливаем передачу скролла от модалки к фону
-    e.stopPropagation();
-  };
+  const preventScroll = (e) => e.preventDefault();
+  const stopScrollPropagation = (e) => e.stopPropagation();
 
   return (
     <section className="py-32 bg-[#F2F2F2] text-slate-900 overflow-hidden relative border-t border-slate-200 font-sans">
@@ -95,11 +86,11 @@ export default function Reviews({ editMode = false, dbData, approvedReviews = []
         {/* HEADER */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8 border-l-4 border-[#dc2626] pl-6 md:pl-8">
           <div className="max-w-2xl">
-            <p className="text-[10px] uppercase tracking-[0.4em] text-[#dc2626] mb-4 font-black">Feedback</p>
+            <p className="text-[10px] uppercase tracking-[0.4em] text-[#dc2626] mb-4 font-black">// Customer_Voice</p>
             <h2
               contentEditable={editMode}
               suppressContentEditableWarning
-              onBlur={(e) => { const nt = e.target.innerText; setTitle(nt); saveAll(staticReviews, nt); }}
+              onBlur={(e) => { const nt = e.target.innerText; setTitle(nt); saveTitle(nt); }}
               className="text-4xl md:text-8xl font-black tracking-tighter uppercase outline-none break-words leading-[0.85] text-slate-900"
             >
               {title}
@@ -124,213 +115,112 @@ export default function Reviews({ editMode = false, dbData, approvedReviews = []
 
         {/* SLIDER */}
         <div ref={scrollRef} className="grid grid-flow-col auto-cols-[100%] md:auto-cols-[480px] gap-8 overflow-x-auto snap-x snap-mandatory pb-12 no-scrollbar" style={{ scrollBehavior: 'smooth' }}>
-          {displayReviews.map((rev) => {
-            const isLong = rev.text.length > 160;
-            return (
-              <div key={rev.id} className="snap-center h-full pt-2">
-                <div className="group bg-white h-full p-10 md:p-12 rounded-[2px] flex flex-col justify-between min-h-[450px] shadow-lg hover:shadow-2xl transition-all duration-[800ms] ease-out hover:-translate-y-2 relative overflow-hidden">
-                  <div className="space-y-8 relative z-10">
-                    <div className="flex justify-between items-start">
-                      <Quote className="text-slate-100 transition-colors duration-500 group-hover:text-red-50" size={56} />
-                      <div className="flex gap-1 text-amber-400">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} size={14} fill={i < (rev.rating || 5) ? "currentColor" : "none"} className={i < (rev.rating || 5) ? "text-amber-400" : "text-slate-200"} />
-                        ))}
+          {displayReviews.length === 0 ? (
+             <div className="text-slate-300 font-black uppercase tracking-widest text-xs p-10">Zatiaľ žiadne schválené recenzie</div>
+          ) : (
+            displayReviews.map((rev) => {
+              const isLong = rev.text.length > 160;
+              return (
+                <div key={rev.id} className="snap-center h-full pt-2">
+                  <div className="group bg-white h-full p-10 md:p-12 rounded-[2px] flex flex-col justify-between min-h-[450px] shadow-lg hover:shadow-2xl transition-all duration-[800ms] ease-out hover:-translate-y-2 relative overflow-hidden">
+                    <div className="space-y-8 relative z-10">
+                      <div className="flex justify-between items-start">
+                        <Quote className="text-slate-100 transition-colors duration-500 group-hover:text-red-50" size={56} />
+                        <div className="flex gap-1 text-amber-400">
+                          {[...Array(5)].map((_, i) => (
+                            <Star key={i} size={14} fill={i < (rev.rating || 5) ? "currentColor" : "none"} className={i < (rev.rating || 5) ? "text-amber-400" : "text-slate-200"} />
+                          ))}
+                        </div>
                       </div>
+                      <p className="text-xl md:text-2xl font-medium text-slate-700 leading-relaxed italic">
+                        "{isLong ? rev.text.substring(0, 160) + "..." : rev.text}"
+                      </p>
+                      {isLong && (
+                        <button
+                          onClick={() => setExpandedReview(rev)}
+                          className="text-[10px] font-black uppercase tracking-[0.3em] text-[#dc2626] hover:text-black transition-colors duration-300 w-fit"
+                        >
+                          Čítať celú skúsenosť
+                        </button>
+                      )}
                     </div>
-                    <p className="text-xl md:text-2xl font-medium text-slate-700 leading-relaxed italic">
-                      "{editMode ? rev.text : (isLong ? rev.text.substring(0, 160) + "..." : rev.text)}"
-                    </p>
-                    {isLong && !editMode && (
-                      <button
-                        onClick={() => setExpandedReview(rev)}
-                        className="text-[10px] font-black uppercase tracking-[0.3em] text-[#dc2626] hover:text-black transition-colors duration-300 w-fit"
-                      >
-                        Čítať celú skúsenosť
-                      </button>
-                    )}
+                    <div className="pt-10 border-t border-slate-100 mt-10 relative z-10">
+                      <div className="font-black text-slate-900 uppercase tracking-widest text-lg">{rev.autor}</div>
+                      <div className="text-[#dc2626] text-[10px] font-black uppercase tracking-[0.3em] mt-2">{rev.mesto}</div>
+                    </div>
+                    <span className="absolute bottom-0 left-0 h-[3px] w-0 bg-[#dc2626] group-hover:w-full transition-all duration-[800ms] ease-out z-20"></span>
                   </div>
-                  <div className="pt-10 border-t border-slate-100 mt-10 relative z-10">
-                    <div className="font-black text-slate-900 uppercase tracking-widest text-lg">{rev.autor}</div>
-                    <div className="text-[#dc2626] text-[10px] font-black uppercase tracking-[0.3em] mt-2">{rev.mesto}</div>
-                  </div>
-                  
-                  <span className="absolute bottom-0 left-0 h-[3px] w-0 bg-[#dc2626] group-hover:w-full transition-all duration-[800ms] ease-out z-20"></span>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
       </div>
 
-      {/* МОДАЛЬНОЕ ОКНО ДЛЯ ДЛИННЫХ ОТЗЫВОВ */}
+      {/* МОДАЛЬНЫЕ ОКНА И ФОРМА — ПОЛНОСТЬЮ СОХРАНЕНЫ */}
       {expandedReview && (
         <div className="fixed inset-0 z-[4000] flex items-center justify-center p-4 sm:p-6">
-          {/* BACKDROP с жесткой блокировкой событий */}
-          <div 
-            className="absolute inset-0 bg-black/95 backdrop-blur-md" 
-            onClick={() => setExpandedReview(null)}
-            onWheel={preventScroll}
-            onTouchMove={preventScroll}
-          ></div>
-          
-          {/* ОКНО МОДАЛКИ с остановкой передачи событий */}
-          <div 
-            className="relative z-10 w-full max-w-3xl bg-white rounded-[2px] shadow-2xl flex flex-col max-h-[90vh] sm:max-h-[85vh] border-t-4 border-[#dc2626] overflow-hidden"
-            onWheel={stopScrollPropagation}
-            onTouchMove={stopScrollPropagation}
-          >
-            
-            {/* HEADER */}
+          <div className="absolute inset-0 bg-black/95 backdrop-blur-md" onClick={() => setExpandedReview(null)} onWheel={preventScroll} onTouchMove={preventScroll}></div>
+          <div className="relative z-10 w-full max-w-3xl bg-white rounded-[2px] shadow-2xl flex flex-col max-h-[90vh] sm:max-h-[85vh] border-t-4 border-[#dc2626] overflow-hidden" onWheel={stopScrollPropagation} onTouchMove={stopScrollPropagation}>
             <div className="flex justify-between items-center p-6 md:px-10 border-b border-slate-100 shrink-0 bg-white">
               <div className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Detail recenzie</div>
-              <button onClick={() => setExpandedReview(null)} className="text-slate-300 hover:text-[#dc2626] transition-colors duration-300">
-                <X size={28} />
-              </button>
+              <button onClick={() => setExpandedReview(null)} className="text-slate-300 hover:text-[#dc2626] transition-colors duration-300"><X size={28} /></button>
             </div>
-
-            {/* ПРОКРУЧИВАЕМАЯ ЧАСТЬ */}
             <div className="p-6 md:p-10 overflow-y-auto overscroll-contain no-scrollbar bg-slate-50 flex-1">
               <div className="space-y-8">
                 <div className="flex gap-1 text-amber-400">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={20} fill={i < (expandedReview.rating || 5) ? "currentColor" : "none"} />
-                  ))}
+                  {[...Array(5)].map((_, i) => (<Star key={i} size={20} fill={i < (expandedReview.rating || 5) ? "currentColor" : "none"} />))}
                 </div>
-                <p className="text-xl md:text-3xl font-medium text-slate-800 leading-relaxed italic break-words">
-                  "{expandedReview.text}"
-                </p>
+                <p className="text-xl md:text-3xl font-medium text-slate-800 leading-relaxed italic break-words">"{expandedReview.text}"</p>
               </div>
             </div>
-
-            {/* FOOTER */}
             <div className="p-6 md:px-10 bg-white border-t border-slate-100 shrink-0">
               <div className="font-black text-slate-900 uppercase tracking-tighter text-xl">{expandedReview.autor}</div>
               <div className="text-[#dc2626] text-[10px] font-black uppercase tracking-[0.4em] mt-1">{expandedReview.mesto}</div>
             </div>
-
           </div>
         </div>
       )}
 
-      {/* МОДАЛКА: ФОРМА */}
       {isFormOpen && (
         <div className="fixed inset-0 z-[4000] flex items-end sm:items-center justify-center">
-          {/* BACKDROP */}
-          <div
-            className="absolute inset-0 bg-black/95 backdrop-blur-md transition-opacity"
-            onClick={() => setIsFormOpen(false)}
-            onWheel={preventScroll}
-            onTouchMove={preventScroll}
-          ></div>
-
-          <form
-            onSubmit={handleClientSubmit}
-            onClick={(e) => e.stopPropagation()}
-            onWheel={stopScrollPropagation}
-            onTouchMove={stopScrollPropagation}
-            className="relative z-10 w-full max-w-2xl h-[100dvh] sm:h-auto sm:max-h-[90vh] bg-white flex flex-col shadow-2xl border-t-4 border-[#dc2626] overflow-hidden rounded-t-[2px] sm:rounded-[2px]"
-          >
-            {/* 1. ХЕДЕР */}
+          <div className="absolute inset-0 bg-black/95 backdrop-blur-md transition-opacity" onClick={() => setIsFormOpen(false)} onWheel={preventScroll} onTouchMove={preventScroll}></div>
+          <form onSubmit={handleClientSubmit} onClick={(e) => e.stopPropagation()} onWheel={stopScrollPropagation} onTouchMove={stopScrollPropagation} className="relative z-10 w-full max-w-2xl h-[100dvh] sm:h-auto sm:max-h-[90vh] bg-white flex flex-col shadow-2xl border-t-4 border-[#dc2626] overflow-hidden rounded-t-[2px] sm:rounded-[2px]">
             <div className="p-6 md:p-10 border-b border-slate-100 flex justify-between items-start bg-white shrink-0">
-              <h3 className="text-3xl md:text-5xl font-black uppercase tracking-tighter text-slate-900 leading-[0.85]">
-                Napísať <br />
-                <span className="text-[#dc2626]">Recenziu</span>
-              </h3>
-              <button
-                type="button"
-                onClick={() => setIsFormOpen(false)}
-                className="text-slate-300 hover:text-[#dc2626] transition-colors p-2 -mt-2 -mr-2"
-              >
-                <X size={32} />
-              </button>
+              <h3 className="text-3xl md:text-5xl font-black uppercase tracking-tighter text-slate-900 leading-[0.85]">Napísať <br /><span className="text-[#dc2626]">Recenziu</span></h3>
+              <button type="button" onClick={() => setIsFormOpen(false)} className="text-slate-300 hover:text-[#dc2626] transition-colors p-2 -mt-2 -mr-2"><X size={32} /></button>
             </div>
-
-            {/* 2. ТЕЛО ФОРМЫ */}
             <div className="flex-1 overflow-y-auto overscroll-contain p-6 md:p-10 space-y-8 no-scrollbar bg-slate-50">
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Имя */}
                 <div className="flex flex-col gap-2">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Vaše meno</label>
-                  <input
-                    name="author"
-                    required
-                    placeholder="MENO"
-                    className="w-full bg-white border border-slate-200 px-4 py-3 outline-none focus:border-[#dc2626] focus:ring-1 focus:ring-[#dc2626] text-slate-900 font-medium uppercase transition-all rounded-[2px] placeholder:text-slate-300"
-                  />
+                  <input name="author" required placeholder="MENO" className="w-full bg-white border border-slate-200 px-4 py-3 outline-none focus:border-[#dc2626] focus:ring-1 focus:ring-[#dc2626] text-slate-900 font-medium uppercase transition-all rounded-[2px]" />
                 </div>
-
-                {/* Рейтинг */}
                 <div className="flex flex-col gap-2">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Hodnotenie</label>
-                  <div className="relative">
-                    <select
-                      name="rating"
-                      required
-                      className="w-full bg-white border border-slate-200 px-4 py-3 outline-none focus:border-[#dc2626] focus:ring-1 focus:ring-[#dc2626] text-slate-900 font-black uppercase rounded-[2px] appearance-none cursor-pointer"
-                    >
-                      <option value="5">⭐⭐⭐⭐⭐ 5/5</option>
-                      <option value="4">⭐⭐⭐⭐ 4/5</option>
-                      <option value="3">⭐⭐⭐ 3/5</option>
-                      <option value="2">⭐⭐ 2/5</option>
-                      <option value="1">⭐ 1/5</option>
-                    </select>
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#dc2626]">
-                      <ChevronRight size={16} className="rotate-90" />
-                    </div>
-                  </div>
+                  <select name="rating" required className="w-full bg-white border border-slate-200 px-4 py-3 outline-none focus:border-[#dc2626] focus:ring-1 focus:ring-[#dc2626] text-slate-900 font-black uppercase rounded-[2px] appearance-none">
+                    <option value="5">⭐⭐⭐⭐⭐ 5/5</option><option value="4">⭐⭐⭐⭐ 4/5</option><option value="3">⭐⭐⭐ 3/5</option><option value="2">⭐⭐ 2/5</option><option value="1">⭐ 1/5</option>
+                  </select>
                 </div>
               </div>
-
-              {/* Локация */}
               <div className="flex flex-col gap-2">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Lokalita (Mesto)</label>
-                <input
-                  name="mesto"
-                  placeholder="NAPR. BRATISLAVA"
-                  className="w-full bg-white border border-slate-200 px-4 py-3 outline-none focus:border-[#dc2626] focus:ring-1 focus:ring-[#dc2626] text-slate-900 font-medium uppercase transition-all rounded-[2px] placeholder:text-slate-300"
-                />
+                <input name="mesto" placeholder="NAPR. BRATISLAVA" className="w-full bg-white border border-slate-200 px-4 py-3 outline-none focus:border-[#dc2626] focus:ring-1 focus:ring-[#dc2626] text-slate-900 font-medium uppercase transition-all rounded-[2px]" />
               </div>
-
-              {/* Текст */}
               <div className="flex flex-col gap-2 pb-6">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Vaša skúsenosť</label>
-                <textarea
-                  name="text"
-                  required
-                  placeholder="NAPÍŠTE NÁM VAŠU SKÚSENOSŤ..."
-                  className="w-full bg-white border border-slate-200 p-4 min-h-[140px] outline-none focus:border-[#dc2626] focus:ring-1 focus:ring-[#dc2626] text-slate-900 font-medium resize-none rounded-[2px] transition-all placeholder:text-slate-300"
-                ></textarea>
+                <textarea name="text" required placeholder="NAPÍŠTE NÁM VAŠU SKÚSENOSŤ..." className="w-full bg-white border border-slate-200 p-4 min-h-[140px] outline-none focus:border-[#dc2626] focus:ring-1 focus:ring-[#dc2626] text-slate-900 font-medium resize-none rounded-[2px]"></textarea>
               </div>
             </div>
-
-            {/* 3. ПОДВАЛ */}
             <div className="p-4 md:p-8 bg-white border-t border-slate-100 flex gap-4 shrink-0">
-              <button
-                type="button"
-                onClick={() => setIsFormOpen(false)}
-                className="flex-1 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-slate-900 transition-colors rounded-[2px]"
-              >
-                Zrušiť
-              </button>
-              <button
-                disabled={isSubmitting}
-                type="submit"
-                className="flex-[2] py-4 bg-[#dc2626] text-white font-black uppercase text-[10px] tracking-[0.3em] hover:bg-slate-900 transition-colors duration-300 disabled:opacity-50 shadow-lg rounded-[2px]"
-              >
-                {isSubmitting ? "Odosielam..." : "Odoslať teraz"}
-              </button>
+              <button type="button" onClick={() => setIsFormOpen(false)} className="flex-1 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-slate-900 transition-colors">Zrušiť</button>
+              <button disabled={isSubmitting} type="submit" className="flex-[2] py-4 bg-[#dc2626] text-white font-black uppercase text-[10px] tracking-[0.3em] hover:bg-slate-900 transition-colors shadow-lg rounded-[2px]">{isSubmitting ? "Odosielam..." : "Odoslať teraz"}</button>
             </div>
           </form>
         </div>
       )}
 
-      <style dangerouslySetInnerHTML={{
-        __html: `
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-      `}} />
+      <style dangerouslySetInnerHTML={{ __html: `.no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }` }} />
     </section>
   );
 }

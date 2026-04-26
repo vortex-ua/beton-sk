@@ -8,11 +8,11 @@ import { getReviewsAction } from "@/actions/reviewActions";
 import Benefits from "@/components/shared/Benefits";
 import DeleteAllCollectionsBtn from "@/components/admin/DeleteAllCollectionsBtn";
 import FooterEditor from "@/components/admin/FooterEditor";
-
-export const dynamic = 'force-dynamic';
+import HeroEditor from "@/components/admin/HeroEditor"; 
 
 export default async function EditorPage() {
   const footerData = await getContent("global", "footer");
+  const heroData = await getContent("domov", "hero");
   const collections = await prisma.collection.findMany({ orderBy: { id: 'asc' } });
   const projects = await prisma.project.findMany({ orderBy: { createdAt: 'desc' } });
   const approvedReviews = await getReviewsAction();
@@ -38,7 +38,17 @@ export default async function EditorPage() {
       <EditorHeader title="INDUSTRIAL_CONTROL_PANEL" />
 
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12 mt-16 space-y-24 w-full">
-
+        
+        {/* --- HERO SECTION EDITOR --- */}
+        <div id="hero-admin" className="bg-white rounded-[2px] shadow-xl overflow-hidden">
+          <SectionHeader 
+            title="Hero Configuration" 
+            subtitle="// Gateway_Visuals / Identity_System" 
+          />
+          <div className="p-8 md:p-10">
+            <HeroEditor dbData={heroData || undefined} />
+          </div>
+        </div>
         {/* --- SEKCIA: KOLEKCIE --- */}
         <div id="kolekcie" className="bg-white rounded-[2px] shadow-xl overflow-hidden group">
           <SectionHeader 
