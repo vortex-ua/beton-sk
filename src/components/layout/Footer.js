@@ -13,7 +13,6 @@ const InstagramIcon = () => (
 export default async function Footer() {
   const footerData = await getContent("global", "footer");
 
-  // Дефолтные значения с флагами видимости
   const d = footerData || {
     firma: "BART Complex s.r.o.", show_firma: true,
     adresa: "Novojelčanská 845/63 925 23 Jelka", show_adresa: true,
@@ -37,13 +36,12 @@ export default async function Footer() {
               <div className="text-slate-400 text-xs leading-relaxed space-y-4">
                 {d.show_firma && <p className="text-white font-black text-sm uppercase tracking-tighter">{d.firma}</p>}
                 {d.show_adresa && (
-                  <p className="flex items-start gap-3">
+                  <p className="flex items-start gap-3 italic">
                     <MapPin size={14} className="shrink-0 text-neutral-700" />
                     {d.adresa}
                   </p>
                 )}
                 {d.show_billing && (
-                  // Внутри Footer компонента, блок биллинга:
                   <div className="pt-4 border-t border-neutral-900 space-y-1 font-mono text-[10px]">
                     {d.show_ico && <p>IČO: {d.ico}</p>}
                     {d.show_dic && <p>DIČ: {d.dic}</p>}
@@ -65,12 +63,12 @@ export default async function Footer() {
                 </div>
                 <div className="space-y-4">
                   {d.show_email && (
-                    <a href={`mailto:${d.email1}`} className="flex items-center gap-3 text-xs hover:text-[#dc2626] transition-colors">
+                    <a href={`mailto:${d.email1}`} className="flex items-center gap-3 text-xs text-white hover:text-white transition-none cursor-pointer">
                       <Mail size={16} className="text-neutral-700" /> {d.email1}
                     </a>
                   )}
                   {d.show_tel && (
-                    <a href={`tel:${d.tel}`} className="flex items-center gap-3 text-xl font-black tracking-tighter hover:text-[#dc2626] transition-colors">
+                    <a href={`tel:${d.tel.replace(/\s+/g, '')}`} className="flex items-center gap-3 text-xl font-black tracking-tighter text-white hover:text-white transition-none cursor-pointer">
                       <Phone size={20} className="text-[#dc2626]" /> {d.tel}
                     </a>
                   )}
@@ -85,14 +83,14 @@ export default async function Footer() {
               <h4 className="text-[#dc2626] text-[10px] font-black uppercase tracking-[0.4em]">// Sledujte nás</h4>
               <div className="flex flex-col gap-4 text-xs font-bold uppercase tracking-widest">
                 {d.show_fb && (
-                  <a href={d.fb_link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 hover:text-[#dc2626] transition-all group">
-                    <span className="p-2 bg-neutral-900 rounded-[2px] group-hover:bg-[#dc2626] transition-colors"><FacebookIcon /></span>
+                  <a href={d.fb_link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 text-white hover:text-white transition-none">
+                    <span className="p-2 bg-neutral-900 rounded-[2px]"><FacebookIcon /></span>
                     Facebook
                   </a>
                 )}
                 {d.show_ig && (
-                  <a href={d.ig_link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 hover:text-[#dc2626] transition-all group">
-                    <span className="p-2 bg-neutral-900 rounded-[2px] group-hover:bg-[#dc2626] transition-colors"><InstagramIcon /></span>
+                  <a href={d.ig_link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 text-white hover:text-white transition-none">
+                    <span className="p-2 bg-neutral-900 rounded-[2px]"><InstagramIcon /></span>
                     Instagram
                   </a>
                 )}
@@ -104,7 +102,7 @@ export default async function Footer() {
           {d.show_widget && (
             <div className="space-y-6">
               <h4 className="text-[#dc2626] text-[10px] font-black uppercase tracking-[0.4em]">// Facebook Feed</h4>
-              <div className="bg-neutral-900 border border-neutral-800 p-1 grayscale hover:grayscale-0 transition-all duration-700 rounded-[2px] overflow-hidden">
+              <div className="bg-neutral-900 border border-neutral-800 p-1 rounded-[2px] overflow-hidden grayscale">
                 <iframe
                   src={`https://www.facebook.com/plugins/page.php?href=${encodeURIComponent(d.fb_link)}&tabs=timeline&width=340&height=230&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false`}
                   style={{ width: '100%', height: '230px' }}
