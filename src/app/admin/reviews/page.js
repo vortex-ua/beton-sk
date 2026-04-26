@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { approveReview, deleteReview, getReviewsAction } from "@/actions/reviewActions";
-import { Trash2, Check, Clock, Star, MessageSquare, ShieldCheck, Loader2 } from "lucide-react";
+import { Trash2, Check, Clock, Star, MessageSquare, ShieldCheck, Loader2, ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 export default function AdminReviewsPage() {
   const [reviews, setReviews] = useState([]);
@@ -47,9 +48,9 @@ export default function AdminReviewsPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-4 bg-slate-50">
-        <Loader2 className="animate-spin text-red-600" size={48} />
-        <p className="text-slate-500 font-black uppercase tracking-widest text-[10px]">Načítavam dáta...</p>
+      <div className="flex flex-col items-center justify-center min-h-screen gap-6 bg-[#f8fafc]">
+        <Loader2 className="animate-spin text-[#dc2626]" size={48} strokeWidth={3} />
+        <p className="text-slate-400 font-black uppercase tracking-[0.4em] text-[10px]">System_Loading...</p>
       </div>
     );
   }
@@ -58,37 +59,46 @@ export default function AdminReviewsPage() {
   const aCount = reviews.filter(r => r.status === 'APPROVED').length;
 
   return (
-    <div className="min-h-screen bg-slate-50/50 pt-24 pb-10 px-4 md:pt-44 md:pb-10 md:px-10 font-sans">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-[#f8fafc] pt-32 pb-20 px-6 md:px-12 font-sans text-slate-900">
+      <div className="max-w-[1400px] mx-auto">
         
+        {/* BACK TO ADMIN */}
+        <Link 
+          href="/admin" 
+          className="inline-flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-[#dc2626] mb-12 transition-all duration-500 group"
+        >
+          <ArrowLeft size={16} className="group-hover:-translate-x-2 transition-transform" /> 
+          Späť do administrácie
+        </Link>
+
         {/* HEADER & STATS */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-10">
-          <div className="text-center lg:text-left">
-            <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tighter uppercase leading-none">
-              Moderácia <span className="text-red-600">recenzií</span>
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10 mb-16 border-l-4 border-[#dc2626] pl-6 md:pl-8">
+          <div>
+            <p className="text-[#dc2626] font-black uppercase tracking-[0.5em] text-[10px] mb-4">Feedback_Control_Unit</p>
+            <h1 className="text-4xl md:text-7xl font-black tracking-tighter uppercase leading-[0.85]">
+              Moderácia <br />
+              <span className="text-slate-300">Recenzií</span>
             </h1>
-            <p className="text-slate-500 text-sm font-medium mt-3 uppercase tracking-wider">Správa spätnej väzby v reálnom čase</p>
           </div>
 
-          {/* Stats: Grid for mobile, Flex for desktop */}
-          <div className="grid grid-cols-2 gap-3 md:flex md:gap-3 w-full lg:w-auto">
-            <div className="bg-white border border-slate-200 p-4 md:p-5 flex flex-col md:flex-row items-center md:items-start gap-3 md:gap-4 md:min-w-[180px]">
-              <div className="w-10 h-10 md:w-12 md:h-12 bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
-                <Clock size={20} className="md:w-6 md:h-6" />
+          <div className="flex gap-4">
+            <div className="bg-white p-6 rounded-[2px] shadow-lg flex items-center gap-6 min-w-[220px]">
+              <div className="w-12 h-12 bg-amber-50 text-amber-500 flex items-center justify-center rounded-[2px]">
+                <Clock size={24} />
               </div>
-              <div className="text-center md:text-left">
-                <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-1">Čakajúce</p>
-                <p className="text-xl md:text-2xl font-black text-slate-900 leading-none">{pCount}</p>
+              <div>
+                <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest">Čakajúce</p>
+                <p className="text-3xl font-black leading-none mt-1">{pCount}</p>
               </div>
             </div>
             
-            <div className="bg-white border border-slate-200 p-4 md:p-5 flex flex-col md:flex-row items-center md:items-start gap-3 md:gap-4 md:min-w-[180px]">
-              <div className="w-10 h-10 md:w-12 md:h-12 bg-green-50 text-green-600 flex items-center justify-center shrink-0">
-                <ShieldCheck size={20} className="md:w-6 md:h-6" />
+            <div className="bg-white p-6 rounded-[2px] shadow-lg flex items-center gap-6 min-w-[220px]">
+              <div className="w-12 h-12 bg-green-50 text-green-500 flex items-center justify-center rounded-[2px]">
+                <ShieldCheck size={24} />
               </div>
-              <div className="text-center md:text-left">
-                <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-1">Schválené</p>
-                <p className="text-xl md:text-2xl font-black text-slate-900 leading-none">{aCount}</p>
+              <div>
+                <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest">Schválené</p>
+                <p className="text-3xl font-black leading-none mt-1">{aCount}</p>
               </div>
             </div>
           </div>
@@ -97,91 +107,82 @@ export default function AdminReviewsPage() {
         {/* LIST */}
         <div className="space-y-6">
           {reviews.length === 0 ? (
-            <div className="bg-white border border-slate-200 py-20 text-center">
-              <MessageSquare className="mx-auto text-slate-100 mb-4" size={48} />
-              <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Žiadne recenzie na správu</p>
+            <div className="bg-white rounded-[2px] py-32 text-center shadow-sm">
+              <MessageSquare className="mx-auto text-slate-100 mb-6" size={64} />
+              <p className="text-slate-300 font-black uppercase tracking-[0.4em] text-[10px]">No_Data_Available</p>
             </div>
           ) : (
             reviews.map((rev) => (
               <div 
                 key={rev.id}
-                className={`bg-white border transition-all duration-500 overflow-hidden ${
-                  rev.status === 'PENDING' ? 'border-amber-400 shadow-[4px_4px_0px_0px_rgba(245,158,11,0.1)] md:shadow-[8px_8px_0px_0px_rgba(245,158,11,0.1)]' : 'border-slate-200'
+                className={`group bg-white rounded-[2px] shadow-md hover:shadow-2xl transition-all duration-[800ms] overflow-hidden relative ${
+                  rev.status === 'PENDING' ? 'border-l-4 border-amber-400' : 'border-l-4 border-slate-900'
                 }`}
               >
-                {/* Pending Badge for Mobile */}
-                {rev.status === 'PENDING' && (
-                  <div className="bg-amber-400 text-black text-[8px] font-black uppercase tracking-[0.2em] py-1 text-center lg:hidden">
-                    Čaká na schválenie
-                  </div>
-                )}
-
-                <div className="p-5 md:p-8 flex flex-col lg:flex-row gap-6 md:gap-8 items-start">
+                <div className="p-8 md:p-10 flex flex-col lg:flex-row gap-10 items-start">
                   
                   {/* USER INFO */}
-                  <div className="flex lg:flex-col items-center lg:items-start gap-4 shrink-0 w-full lg:w-40">
-                    <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-900 flex items-center justify-center text-white text-xl md:text-3xl font-black shrink-0">
+                  <div className="flex lg:flex-col items-center lg:items-start gap-6 shrink-0 w-full lg:w-48">
+                    <div className="w-16 h-16 bg-slate-900 text-white flex items-center justify-center text-3xl font-black rounded-[2px] shadow-xl group-hover:bg-[#dc2626] transition-colors duration-700">
                       {rev.author ? rev.author[0].toUpperCase() : "?"}
                     </div>
-                    <div className="overflow-hidden">
-                      <h4 className="font-black text-slate-900 uppercase tracking-tighter truncate text-base md:text-lg">{rev.author || "Anonym"}</h4>
-                      <p className="text-[8px] font-black text-red-600 uppercase tracking-[0.2em] mt-0.5 md:mt-1">Overený zdroj</p>
+                    <div>
+                      <h4 className="font-black text-slate-900 uppercase tracking-tighter text-xl leading-none">{rev.author || "Anonym"}</h4>
+                      <p className="text-[9px] font-black text-[#dc2626] uppercase tracking-widest mt-2">Verified_User</p>
                     </div>
                   </div>
 
                   {/* CONTENT */}
-                  <div className="flex-1 min-w-0 w-full">
-                    <div className="flex items-center justify-between mb-4 md:mb-6">
-                      <div className="flex gap-0.5 text-amber-400">
+                  <div className="flex-1 min-w-0 w-full space-y-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex gap-1 text-amber-400">
                         {[...Array(5)].map((_, i) => (
                           <Star 
                             key={i} 
-                            size={12} 
+                            size={14} 
                             fill={i < rev.rating ? "currentColor" : "none"}
-                            className={i < rev.rating ? "text-amber-400" : "text-slate-200"} 
+                            className={i < rev.rating ? "text-amber-400" : "text-slate-100"} 
                           />
                         ))}
                       </div>
-                      <span className="text-[9px] font-mono text-slate-400">
-                        {rev.createdAt ? new Date(rev.createdAt).toLocaleDateString('sk-SK') : ""}
+                      <span className="text-[10px] font-mono text-slate-300 uppercase tracking-widest">
+                        // Log_Date: {rev.createdAt ? new Date(rev.createdAt).toLocaleDateString('sk-SK') : "---"}
                       </span>
                     </div>
                     
-                    <p className="text-slate-700 text-base md:text-xl leading-snug italic break-words whitespace-pre-wrap pr-2">
+                    <p className="text-slate-700 text-xl md:text-2xl leading-relaxed italic font-medium pr-10">
                       "{rev.text}"
                     </p>
                   </div>
 
                   {/* ACTIONS */}
-                  <div className="flex flex-row lg:flex-col gap-2 w-full lg:w-48 pt-6 lg:pt-0 border-t lg:border-t-0 border-slate-50">
+                  <div className="flex flex-row lg:flex-col gap-3 w-full lg:w-56 pt-8 lg:pt-0 border-t lg:border-t-0 border-slate-50">
                     {rev.status === 'PENDING' ? (
                       <button 
                         onClick={() => handleApprove(rev.id)}
-                        className="flex-1 flex items-center justify-center gap-2 bg-slate-900 text-white px-4 py-3 md:py-4 font-black uppercase text-[9px] md:text-[10px] tracking-widest hover:bg-green-600 transition-all active:scale-95"
+                        className="flex-1 flex items-center justify-center gap-3 bg-slate-900 text-white px-6 py-4 font-black uppercase text-[10px] tracking-[0.2em] hover:bg-green-600 transition-all duration-500 rounded-[2px] shadow-lg active:scale-95"
                       >
-                        <Check size={14} className="shrink-0" /> Schváliť
+                        <Check size={16} /> Schváliť
                       </button>
                     ) : (
-                      <div className="flex-1 flex items-center justify-center gap-2 bg-green-50 text-green-600 border border-green-100 px-4 py-3 md:py-4 font-black uppercase text-[9px] md:text-[10px] tracking-widest cursor-default">
-                        <ShieldCheck size={14} className="shrink-0" /> <span className="hidden sm:inline">Publikované</span><span className="sm:hidden">OK</span>
+                      <div className="flex-1 flex items-center justify-center gap-3 bg-slate-50 text-green-600 border border-green-100 px-6 py-4 font-black uppercase text-[10px] tracking-[0.2em] rounded-[2px] cursor-default">
+                        <ShieldCheck size={16} /> Publikované
                       </div>
                     )}
                     
                     <button 
                       onClick={() => handleDelete(rev.id)}
-                      className="flex-1 flex items-center justify-center gap-2 text-slate-400 hover:text-red-600 hover:bg-red-50 px-4 py-3 md:py-4 font-black uppercase text-[9px] md:text-[10px] tracking-widest transition-all"
+                      className="flex-1 flex items-center justify-center gap-3 text-slate-400 hover:text-white hover:bg-[#dc2626] px-6 py-4 font-black uppercase text-[10px] tracking-[0.2em] transition-all duration-500 rounded-[2px]"
                     >
-                      <Trash2 size={14} className="shrink-0" /> Zmazať
+                      <Trash2 size={16} /> Zmazať
                     </button>
                   </div>
                 </div>
 
-                {/* Desktop Pending Badge */}
-                {rev.status === 'PENDING' && (
-                  <div className="hidden lg:block bg-amber-400 text-black text-[9px] font-black uppercase tracking-widest px-4 py-1 w-full text-center">
-                    Čaká na schválenie
-                  </div>
-                )}
+                {/* BOTTOM PROGRESS LINE */}
+                <span className={`absolute bottom-0 left-0 h-[3px] w-0 transition-all duration-[800ms] ease-out group-hover:w-full ${
+                  rev.status === 'PENDING' ? 'bg-amber-400' : 'bg-[#dc2626]'
+                }`}></span>
               </div>
             ))
           )}

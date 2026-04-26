@@ -1,75 +1,120 @@
 "use client";
 import { useState } from "react";
 import { saveContent } from "@/actions/adminActions";
-import { Save } from "lucide-react";
+import { Save, Eye, EyeOff } from "lucide-react";
 
 export default function FooterEditor({ dbData }) {
   const [data, setData] = useState(dbData || {
-    firma: "BART Complex s.r.o.",
-    adresa: "Novojelčanská 845/63 925 23 Jelka",
-    ico: "51921979",
-    dic: "2120839974",
-    icdph: "SK2120839974",
-    email1: "info@beton-plotysk.sk",
-    email2: "ploty.pezinok@gmail.com",
-    tel: "0911 640 097",
-    fb_link: "https://www.facebook.com/bartcomplex",
-    ig_link: "https://www.facebook.com/bartcomplex"
+    firma: "BART Complex s.r.o.", show_firma: true,
+    adresa: "Novojelčanská 845/63 925 23 Jelka", show_adresa: true,
+    ico: "51921979", show_ico: true,
+    dic: "2120839974", show_dic: true,
+    icdph: "SK2120839974", show_icdph: true,
+    email1: "info@beton-plotysk.sk", show_email: true,
+    tel: "0911 640 097", show_tel: true,
+    fb_link: "https://www.facebook.com/bartcomplex", show_fb: true,
+    ig_link: "https://www.facebook.com/bartcomplex", show_ig: true,
+    show_widget: true
   });
 
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    setData({ ...data, [e.target.name]: e.target.value });
+    const { name, value, type, checked } = e.target;
+    setData({ ...data, [name]: type === "checkbox" ? checked : value });
   };
 
   const handleSave = async () => {
     setLoading(true);
     await saveContent("global", "footer", data);
     setLoading(false);
-    alert("Údaje v pätičke boli uložené.");
+    alert("Konfigurácia bola úspešne uložená.");
   };
 
+  const Toggle = ({ name, label, checked }) => (
+    <label className="flex items-center gap-3 cursor-pointer group">
+      <div className="relative">
+        <input type="checkbox" name={name} checked={checked} onChange={handleChange} className="sr-only" />
+        <div className={`w-8 h-4 rounded-full transition-colors ${checked ? 'bg-[#dc2626]' : 'bg-slate-200'}`}></div>
+        <div className={`absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full transition-transform ${checked ? 'translate-x-4' : ''}`}></div>
+      </div>
+      <span className={`text-[9px] font-black uppercase tracking-widest ${checked ? 'text-slate-900' : 'text-slate-400'}`}>
+        {label}
+      </span>
+    </label>
+  );
+
   return (
-    <div className="space-y-8 font-sans">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div className="space-y-12 font-sans bg-white p-8 rounded-[2px] shadow-inner border border-slate-100">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
         
-        {/* FIREMNÉ ÚDAJE */}
-        <div className="space-y-4">
-          <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest block">Firma & Sídlo</label>
-          <input name="firma" value={data.firma} onChange={handleChange} className="w-full bg-slate-50 border-b border-slate-200 p-2 text-sm font-bold uppercase focus:border-black outline-none" />
-          <input name="adresa" value={data.adresa} onChange={handleChange} className="w-full bg-slate-50 border-b border-slate-200 p-2 text-sm font-bold uppercase focus:border-black outline-none" />
-          <div className="grid grid-cols-2 gap-4 pt-4">
-            <input name="ico" placeholder="IČO" value={data.ico} onChange={handleChange} className="bg-slate-50 border-b border-slate-200 p-2 text-xs outline-none" />
-            <input name="dic" placeholder="DIČ" value={data.dic} onChange={handleChange} className="bg-slate-50 border-b border-slate-200 p-2 text-xs outline-none" />
+        {/* FIRMA A SÍDLO */}
+        <div className="space-y-8">
+          <div className="space-y-4">
+             <Toggle name="show_firma" label="Názov firmy" checked={data.show_firma} />
+             <input name="firma" value={data.firma} onChange={handleChange} className="w-full bg-slate-50 p-3 text-xs font-bold uppercase rounded-[2px] outline-none border-b-2 border-transparent focus:border-[#dc2626]" />
           </div>
-          <input name="icdph" placeholder="IČ DPH" value={data.icdph} onChange={handleChange} className="w-full bg-slate-50 border-b border-slate-200 p-2 text-xs outline-none" />
+          <div className="space-y-4">
+             <Toggle name="show_adresa" label="Adresa sídla" checked={data.show_adresa} />
+             <input name="adresa" value={data.adresa} onChange={handleChange} className="w-full bg-slate-50 p-3 text-xs font-bold uppercase rounded-[2px] outline-none border-b-2 border-transparent focus:border-[#dc2626]" />
+          </div>
+        </div>
+
+        {/* FAKTURAČNÉ ÚDAJE (ИНДИВИДУАЛЬНЫЕ ЧЕКБОКСЫ) */}
+        <div className="space-y-6 bg-slate-50/50 p-4 rounded-[2px] border border-slate-100">
+          <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4">Fakturačné údaje</h4>
+          
+          <div className="space-y-3">
+            <Toggle name="show_ico" label="IČO" checked={data.show_ico} />
+            <input name="ico" value={data.ico} onChange={handleChange} className="w-full bg-white p-2 text-[10px] font-mono border-b border-slate-100 outline-none focus:border-black" />
+          </div>
+
+          <div className="space-y-3">
+            <Toggle name="show_dic" label="DIČ" checked={data.show_dic} />
+            <input name="dic" value={data.dic} onChange={handleChange} className="w-full bg-white p-2 text-[10px] font-mono border-b border-slate-100 outline-none focus:border-black" />
+          </div>
+
+          <div className="space-y-3">
+            <Toggle name="show_icdph" label="IČ DPH" checked={data.show_icdph} />
+            <input name="icdph" value={data.icdph} onChange={handleChange} className="w-full bg-white p-2 text-[10px] font-mono border-b border-slate-100 outline-none focus:border-black" />
+          </div>
         </div>
 
         {/* KONTAKTY */}
-        <div className="space-y-4">
-          <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest block">Kontaktné údaje</label>
-          <input name="email1" value={data.email1} onChange={handleChange} className="w-full bg-slate-50 border-b border-slate-200 p-2 text-sm font-bold focus:border-black outline-none" />
-          <input name="email2" value={data.email2} onChange={handleChange} className="w-full bg-slate-50 border-b border-slate-200 p-2 text-sm font-bold focus:border-black outline-none" />
-          <input name="tel" value={data.tel} onChange={handleChange} className="w-full bg-slate-50 border-b border-slate-200 p-2 text-sm font-black focus:border-black outline-none" />
+        <div className="space-y-8">
+          <div className="space-y-4">
+            <Toggle name="show_email" label="Primárny Email" checked={data.show_email} />
+            <input name="email1" value={data.email1} onChange={handleChange} className="w-full bg-slate-50 p-3 text-xs font-bold rounded-[2px] outline-none border-b-2 border-transparent focus:border-[#dc2626]" />
+          </div>
+          <div className="space-y-4">
+            <Toggle name="show_tel" label="Telefónne číslo" checked={data.show_tel} />
+            <input name="tel" value={data.tel} onChange={handleChange} className="w-full bg-slate-50 p-3 text-sm font-black rounded-[2px] outline-none border-b-2 border-transparent focus:border-[#dc2626]" />
+          </div>
         </div>
 
-        {/* SOCIÁLNE SIETE */}
-        <div className="space-y-4">
-          <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest block">Sociálne siete</label>
-          <input name="fb_link" placeholder="Facebook Link" value={data.fb_link} onChange={handleChange} className="w-full bg-slate-50 border-b border-slate-200 p-2 text-xs outline-none" />
-          <input name="ig_link" placeholder="Instagram Link" value={data.ig_link} onChange={handleChange} className="w-full bg-slate-50 border-b border-slate-200 p-2 text-xs outline-none" />
+        {/* SOCIÁLNE SIETE & WIDGET */}
+        <div className="space-y-8">
+          <div className="space-y-4">
+            <Toggle name="show_fb" label="Facebook Link" checked={data.show_fb} />
+            <input name="fb_link" value={data.fb_link} onChange={handleChange} className="w-full bg-slate-50 p-3 text-[10px] rounded-[2px] outline-none" />
+          </div>
+          <div className="space-y-4">
+            <Toggle name="show_ig" label="Instagram Link" checked={data.show_ig} />
+            <input name="ig_link" value={data.ig_link} onChange={handleChange} className="w-full bg-slate-50 p-3 text-[10px] rounded-[2px] outline-none" />
+          </div>
+          <div className="pt-4 border-t border-slate-100">
+            <Toggle name="show_widget" label="Aktívny FB Feed" checked={data.show_widget} />
+          </div>
         </div>
-
       </div>
 
-      <div className="pt-8 border-t border-slate-100 flex justify-end">
+      <div className="pt-10 border-t border-slate-100 flex justify-end">
         <button 
           onClick={handleSave}
           disabled={loading}
-          className="flex items-center gap-3 bg-black text-white px-10 py-4 text-[10px] font-black uppercase tracking-widest hover:bg-red-600 transition-all disabled:opacity-50"
+          className="bg-slate-900 text-white px-12 py-5 text-[10px] font-black uppercase tracking-[0.3em] hover:bg-[#dc2626] transition-all duration-500 rounded-[2px] disabled:opacity-50 flex items-center gap-4"
         >
-          <Save size={16} /> {loading ? "Ukladám..." : "Uložiť pätičku"}
+          <Save size={16} /> {loading ? "Prebieha zápis..." : "Uložiť zmeny"}
         </button>
       </div>
     </div>

@@ -51,60 +51,78 @@ export default function About({ editMode = false, dbData = defaultData }) {
       contentEditable: true,
       suppressContentEditableWarning: true,
       onBlur: (e) => handleBlur(field, e),
-      className: "outline-none focus:ring-1 focus:ring-slate-900 p-1 transition-all",
+      // Индустриальный фокус для полей ввода в админке
+      className: "outline-none hover:bg-slate-50 focus:bg-slate-50 focus:ring-1 focus:ring-[#dc2626] transition-all rounded-[2px] p-2 -ml-2",
       title: "Kliknite pre úpravu"
     };
   };
 
   return (
-    <section id="onas" className={`py-32 bg-[#F5F5F5] overflow-hidden relative border-t border-slate-100 ${editMode ? 'ring-1 ring-inset ring-red-500' : ''}`}>
+    <section id="onas" className={`py-24 lg:py-40 bg-white overflow-hidden relative border-t border-slate-200 font-sans ${editMode ? 'ring-2 ring-inset ring-[#dc2626]' : ''}`}>
       
+      {/* ПЛАШКА АДМИНА */}
       {editMode && (
-        <div className="absolute top-0 left-0 bg-red-600 text-white text-[10px] font-black px-4 py-2 uppercase tracking-widest z-50">
+        <div className="absolute top-0 left-0 bg-[#dc2626] text-white text-[10px] font-black px-4 py-2 uppercase tracking-widest z-50 rounded-br-[2px]">
           Admin / Edit Mode
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-center">
 
-          {/* ТЕКСТОВАЯ ЧАСТЬ (8 колонок на десктопе для воздуха) */}
+          {/* ТЕКСТОВАЯ ЧАСТЬ (7 колонок) */}
           <div className="lg:col-span-7 space-y-12">
-            <div className="border-l border-slate-900 pl-8">
+            
+            <div className="border-l-4 border-[#dc2626] pl-6 md:pl-8">
+              <div className="flex items-center gap-4 mb-6">
+                <span className="text-[#dc2626] text-[10px] font-black uppercase tracking-[0.4em]">
+                  O spoločnosti
+                </span>
+              </div>
               <h2 
                 {...getEditableProps("hlavnyNadpis")} 
-                className="text-4xl md:text-5xl lg:text-6xl font-light text-slate-900 leading-[1.1] tracking-tighter uppercase break-words"
+                className="text-5xl md:text-7xl font-black text-slate-900 uppercase tracking-tighter leading-[0.85] break-words"
               >
                 {content.hlavnyNadpis}
               </h2>
             </div>
             
-            <div className="space-y-8 text-lg font-light text-slate-500 leading-relaxed max-w-2xl">
+            <div className="space-y-8 text-sm md:text-base font-medium text-slate-500 uppercase tracking-tight max-w-2xl leading-relaxed pl-1 md:pl-3">
               <p {...getEditableProps("odstavec1")} className="break-words">
-                {content.odstavec1}
+                // {content.odstavec1}
               </p>
               
               <div className="flex gap-4 items-start">
-                 <div className="w-8 h-px bg-slate-300 mt-4 shrink-0"></div>
-                 <p {...getEditableProps("odstavec2")} className="break-words italic">
+                 <div className="w-8 h-[2px] bg-[#dc2626] mt-2.5 shrink-0 rounded-[2px]"></div>
+                 <p {...getEditableProps("odstavec2")} className="break-words italic text-slate-700">
                    {content.odstavec2}
                  </p>
               </div>
               
               <p {...getEditableProps("odstavec3")} className="break-words">
-                {content.odstavec3}
+                // {content.odstavec3}
               </p>
             </div>
           </div>
 
           {/* КАРТИНКА (5 колонок) */}
-          <div className="lg:col-span-5 relative h-[500px] lg:h-[650px] w-full rounded-none overflow-hidden group">
+          <div className="lg:col-span-5 relative h-[500px] lg:h-[700px] w-full rounded-[2px] overflow-hidden group shadow-xl">
+            
+            {/* ТЕХНИЧЕСКИЙ МАРКЕР */}
+            <div className="absolute top-6 left-6 text-[10px] font-mono font-bold text-white/70 tracking-widest bg-black/40 px-2 py-1 rounded-[2px] backdrop-blur-sm z-20 transition-colors duration-500 group-hover:bg-[#dc2626] group-hover:text-white">
+              REF_ABOUT
+            </div>
+
+            {/* ПРОГРЕСС-БАР СНИЗУ */}
+            <span className="absolute bottom-0 left-0 h-[3px] w-0 bg-[#dc2626] group-hover:w-full transition-all duration-[800ms] ease-out z-20"></span>
+
+            {/* ИНТЕРФЕЙС ЗАГРУЗКИ ФОТО (ADMIN) */}
             {editMode && (
                 <div 
                   onClick={() => fileInputRef.current?.click()} 
-                  className="absolute inset-0 bg-black/40 z-20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer backdrop-blur-sm"
+                  className="absolute inset-0 bg-black/60 z-30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 cursor-pointer backdrop-blur-sm"
                 >
-                   <span className="text-white text-[10px] uppercase tracking-[0.3em] font-black border border-white px-6 py-3">
+                   <span className="bg-[#dc2626] text-white text-[10px] uppercase tracking-[0.3em] font-black rounded-[2px] px-8 py-4 shadow-2xl">
                      {isUploading ? "Nahrávam..." : "Vymeniť foto"}
                    </span>
                 </div>
@@ -112,15 +130,17 @@ export default function About({ editMode = false, dbData = defaultData }) {
             
             <input type="file" accept="image/*" className="hidden" ref={fileInputRef} onChange={handleImageChange} />
 
+            {/* ЧИСТАЯ АНИМАЦИЯ: 800ms, scale-100 -> 110, гарантия цвета */}
             <Image
               src={content.obrazok || defaultData.obrazok}
               alt="Elite Industrial About"
               fill
-              className={`object-cover grayscale hover:grayscale-0 transition-all duration-1000 ease-out scale-105 group-hover:scale-100 ${isUploading ? 'opacity-30 blur-md' : ''}`}
+              className={`object-cover filter grayscale scale-100 transition-all duration-[800ms] ease-in-out group-hover:!grayscale-0 group-hover:scale-110 ${isUploading ? 'opacity-30 blur-md' : ''}`}
             />
             
-            {/* Тонкая рамка поверх картинки для стиля */}
-            <div className="absolute inset-4 border border-white/20 pointer-events-none"></div>
+            {/* ГРАДИЕНТ (исчезает при наведении) */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-60 transition-opacity duration-[800ms] group-hover:opacity-20 pointer-events-none z-10"></div>
+            
           </div>
 
         </div>

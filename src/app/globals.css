@@ -26,26 +26,23 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Odstraňuje konflikt systémového scrollovania s JS knižnicami */
   overscroll-behavior-y: none; 
 }
 
 /* OPTIMALIZÁCIA GRAFIKY (GPU) */
 .gpu-optimize, .group {
-  /* Vytvorí novú vrstvu na GPU, ale nepreťažuje ju */
   transform: translateZ(0); 
   backface-visibility: hidden;
   perspective: 1000;
-  /* Hovorí prehliadaču, čo sa bude hýbať, aby sa pripravil */
   will-change: transform, opacity;
 }
 
 /* OBRÁZKY - CLS & RENDERING */
 img {
-  /* Prehliadač nerieši obrázky, ktoré sú mimo obrazovky */
   content-visibility: auto;
-  /* Zabraňuje trhaniu pri zmene grayscale/scale */
-  transition: transform 0.3s ease-out, filter 0.3s ease-out !important;
+  /* ВНИМАНИЕ: Глобальный transition !important УДАЛЕН. 
+    Теперь анимациями полностью управляет Tailwind (duration-700, ease-in-out и т.д.) прямо в компонентах.
+  */
 }
 
 .project-card-image {
@@ -74,20 +71,6 @@ button, [role="button"] {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
   user-select: none;
-}
-
-/* ⚠️ POZOR: BACKDROP BLUR JE ŽRÚT VÝKONU */
-/* Ak chceš 240Hz plynulosť, odporúčam toto nepoužívať na veľké plochy */
-.backdrop-blur-md {
-  background-color: rgba(255, 255, 255, 0.8) !important; /* Záložný plán */
-}
-
-@supports (backdrop-filter: blur(10px)) {
-  .backdrop-blur-md {
-    /* Ak to musí byť, tak len jemne a na malých plochách */
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-  }
 }
 
 /* LAYOUT FIX */
