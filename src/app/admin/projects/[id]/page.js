@@ -5,7 +5,6 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Save, Trash2 } from "lucide-react";
 import ImagePicker from "@/components/admin/ImagePicker";
-// ИМПОРТИРУЕМ НАШ НОВЫЙ КОМПОНЕНТ
 import MultiImagePicker from "@/components/admin/MultiImagePicker";
 
 export default async function EditProjectPage({ params }) {
@@ -16,7 +15,7 @@ export default async function EditProjectPage({ params }) {
     where: { id: Number(id) }
   });
 
-  if (!project) return <div>Projekt nebol nájdený</div>;
+  if (!project) return <div className="pt-40 text-center font-black uppercase tracking-widest text-red-600 text-xs">Projekt nebol nájdený // 404</div>;
 
   async function handleSave(formData) {
     "use server";
@@ -26,7 +25,6 @@ export default async function EditProjectPage({ params }) {
       location: formData.get("location"),
       description: formData.get("description"),
       mainImage: formData.get("mainImage"),
-      // ВОТ ЭТА СТРОКА САМАЯ ВАЖНАЯ ДЛЯ ГАЛЕРЕИ:
       images: formData.get("images"), 
     };
     await updateProject(id, data);
@@ -45,84 +43,108 @@ export default async function EditProjectPage({ params }) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12 px-4">
-      <div className="max-w-3xl mx-auto">
-        <Link href="/admin/editor#realizacie" className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 mb-8 font-medium transition-colors">
-          <ArrowLeft size={20} /> Späť do editora
+    /* УМЕНЬШЕННЫЙ ОТСТУП: pt-24 для мобилок, md:pt-32 для десктопа */
+    <div className="min-h-screen bg-[#F2F2F2] pt-24 md:pt-32 pb-24 px-6 font-sans text-black selection:bg-red-600 selection:text-white">
+      <div className="max-w-4xl mx-auto">
+        
+        {/* BACK LINK */}
+        <Link 
+          href="/admin/editor#realizacie" 
+          className="inline-flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-red-600 mb-8 transition-colors group"
+        >
+          <ArrowLeft size={16} className="group-hover:-translate-x-2 transition-transform" /> 
+          // Späť_do_editora
         </Link>
 
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="bg-white border border-black rounded-none shadow-2xl overflow-hidden relative">
+          <div className="absolute top-0 left-0 w-full h-1 bg-red-600"></div>
+
           <form action={handleSave}>
             
-            <ImagePicker defaultValue={project.mainImage} />
+            {/* ГЛАВНОЕ ФОТО */}
+            <div className="border-b border-black">
+              <div className="bg-slate-50 p-4 text-[9px] font-black uppercase tracking-widest text-slate-400 border-b border-black flex justify-between items-center">
+                <span>// Titulná_fotografia</span>
+                <span className="text-[8px] font-mono text-black">ID: {id}</span>
+              </div>
+              <ImagePicker defaultValue={project.mainImage} />
+            </div>
 
-            <div className="p-8 md:p-12 space-y-6">
-              <div className="flex items-center gap-4 mb-4 pb-4 border-b border-slate-100">
-                <div>
-                  <h1 className="text-3xl font-black text-slate-900">Upraviť realizáciu</h1>
-                  <p className="text-slate-500">Zmeňte detaily hotového projektu</p>
-                </div>
+            <div className="p-8 md:p-14 space-y-10">
+              
+              {/* HEADER */}
+              <div className="border-l-4 border-red-600 pl-8">
+                <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-[0.9]">
+                  Upraviť <span className="text-red-600">Projekt</span>
+                </h1>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* INPUT GRID */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Názov projektu</label>
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Názov projektu</label>
                   <input 
                     name="title" 
                     defaultValue={project.title} 
                     required
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:ring-2 focus:ring-green-500 outline-none" 
+                    className="w-full bg-slate-50 border-b-2 border-slate-200 px-4 py-3 text-black font-bold uppercase focus:border-red-600 focus:bg-white outline-none transition-all" 
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Štýl / Kategória</label>
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Štýl / Kategória</label>
                   <input 
                     name="category" 
                     defaultValue={project.category} 
                     required
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:ring-2 focus:ring-green-500 outline-none" 
+                    className="w-full bg-slate-50 border-b-2 border-slate-200 px-4 py-3 text-black font-bold uppercase focus:border-red-600 focus:bg-white outline-none transition-all" 
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Lokalita (Mesto)</label>
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Lokalita</label>
                   <input 
                     name="location" 
                     defaultValue={project.location || ""} 
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:ring-2 focus:ring-green-500 outline-none" 
+                    className="w-full bg-slate-50 border-b-2 border-slate-200 px-4 py-3 text-black font-bold uppercase focus:border-red-600 focus:bg-white outline-none transition-all" 
                   />
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Popis projektu</label>
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Popis</label>
                   <textarea 
                     name="description" 
                     defaultValue={project.description} 
                     required
-                    rows={6} 
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:ring-2 focus:ring-green-500 outline-none" 
+                    rows={5} 
+                    className="w-full bg-slate-50 border border-slate-200 p-4 text-black font-medium focus:border-red-600 focus:bg-white outline-none transition-all resize-none" 
                   />
                 </div>
 
-                {/* === НАШ БЛОК ГАЛЕРЕИ === */}
-                <div className="md:col-span-2 pt-6 border-t border-slate-100">
-                  <MultiImagePicker defaultValue={project.images || []} />
+                {/* ГАЛЕРЕЯ */}
+                <div className="md:col-span-2 pt-8 border-t border-slate-100">
+                   <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 font-mono mb-6">// Foto_Galéria</label>
+                   <MultiImagePicker defaultValue={project.images || []} />
                 </div>
               </div>
 
-              <div className="pt-8 mt-8 border-t border-slate-100 flex justify-between items-center">
+              {/* ACTION BUTTONS */}
+              <div className="pt-10 mt-10 border-t border-black flex flex-col sm:flex-row justify-between items-center gap-6">
                 <button 
                   formAction={handleDelete}
-                  className="px-6 py-3 text-red-500 font-bold hover:bg-red-50 rounded-xl flex items-center gap-2 transition-colors"
+                  className="w-full sm:w-auto px-6 py-4 text-[#dc2626] font-black uppercase text-[9px] tracking-[0.3em] hover:bg-red-50 transition-all flex items-center justify-center gap-2"
                 >
-                  <Trash2 size={20} /> Vymazať
+                  <Trash2 size={16} /> Zmazať_Záznam
                 </button>
+                
                 <button 
                   type="submit" 
-                  className="px-8 py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-green-600 transition-colors shadow-lg flex items-center gap-2"
+                  className="w-full sm:w-auto group relative px-14 py-5 bg-black text-white font-black uppercase text-[11px] tracking-[0.3em] overflow-hidden transition-all shadow-xl active:scale-95"
                 >
-                  <Save size={20} /> Uložiť zmeny
+                  <span className="relative z-10 flex items-center gap-4">
+                    <Save size={18} /> Uložiť_Zmeny
+                  </span>
+                  <div className="absolute inset-0 bg-red-600 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
                 </button>
               </div>
             </div>

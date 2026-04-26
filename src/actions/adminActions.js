@@ -3,11 +3,15 @@
 import { prisma } from "@/lib/prisma";
 import { put } from '@vercel/blob';
 import { revalidatePath } from "next/cache";
-
+import { getServerSession } from "next-auth";
 /**
  * СОХРАНЕНИЕ ОБЩЕГО КОНТЕНТА (Hero, Footer, About и т.д.)
  */
 export async function saveContent(stranka, sekcia, obsah) {
+  const session = await getServerSession();
+  if (!session) {
+    throw new Error("Unauthorized access! Nice try.");
+  }
   try {
     const updated = await prisma.strankaObsah.upsert({
       where: { sekcia: sekcia },

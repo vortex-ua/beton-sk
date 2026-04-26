@@ -120,9 +120,7 @@ export default async function EditorPage() {
                 <a href="/admin/reviews" className="px-6 py-4 border-2 border-slate-900 text-slate-900 font-black text-[10px] uppercase tracking-[0.2em] hover:bg-slate-900 hover:text-white transition-all rounded-[2px]">
                   Moderovať
                 </a>
-                <a href="/admin/reviews/new" className="px-8 py-4 bg-[#dc2626] text-white font-black text-[10px] uppercase tracking-[0.2em] hover:bg-slate-900 transition-all rounded-[2px]">
-                  + Nová recenzia
-                </a>
+              
               </div>
             }
           />

@@ -27,25 +27,29 @@ export default function NewProjectPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F2F2F2] pt-32 md:pt-44 pb-24 px-6 font-sans text-black">
+    /* ИСПРАВЛЕНО: pt-32 для мобильных, md:pt-48 для десктопа */
+    <div className="min-h-screen bg-[#F2F2F2] pt-32 md:pt-48 pb-24 px-6 font-sans text-black selection:bg-red-600 selection:text-white">
       <div className="max-w-4xl mx-auto">
         
-        {/* BACK LINK - Stylizovaný ako systémový marker */}
+        {/* BACK LINK */}
         <Link 
           href="/admin/editor#realizacie" 
-          className="inline-flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-black mb-12 transition-colors group"
+          className="inline-flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-red-600 mb-10 transition-colors group"
         >
           <ArrowLeft size={16} className="group-hover:-translate-x-2 transition-transform" /> 
-          Back_to_System / Editor
+          // Terminal_Back / Editor_Exit
         </Link>
 
-        <div className="bg-white border border-black rounded-none shadow-2xl overflow-hidden">
+        <div className="bg-white border border-black rounded-none shadow-2xl overflow-hidden relative">
+          <div className="absolute top-0 left-0 w-full h-1 bg-red-600"></div>
+
           <form action={handleSave}>
             
-            {/* ГЛАВНОЕ ФОТО (ImagePicker) */}
+            {/* ГЛАВНОЕ ФОТО */}
             <div className="border-b border-black">
-              <div className="bg-slate-50 p-4 text-[9px] font-black uppercase tracking-widest text-slate-400 border-b border-black">
-                // Titulná_fotografia_projektu
+              <div className="bg-slate-50 p-4 text-[9px] font-black uppercase tracking-widest text-slate-400 border-b border-black flex justify-between items-center">
+                <span>// Titulná_fotografia_projektu</span>
+                <span className="text-[8px] opacity-50 font-mono text-black">Status: Awaiting_Data</span>
               </div>
               <ImagePicker defaultValue="" />
             </div>
@@ -53,11 +57,12 @@ export default function NewProjectPage() {
             <div className="p-8 md:p-16 space-y-12">
               {/* HEADER */}
               <div className="border-l-4 border-red-600 pl-8">
-                <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-none">
-                  Nová <span className="text-red-600">Realizácia</span>
+                <h1 className="text-4xl md:text-7xl font-black uppercase tracking-tighter leading-[0.85]">
+                  Nová <br />
+                  <span className="text-red-600">Realizácia</span>
                 </h1>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-4">
-                  Pridanie nového záznamu do technického portfólia
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-6">
+                  System_Entry: Pridanie nového záznamu do portfólia
                 </p>
               </div>
 
@@ -69,7 +74,7 @@ export default function NewProjectPage() {
                     name="title" 
                     required 
                     placeholder="NAPR. OPLOTENIE_DOMU_DUN_STREDA" 
-                    className="w-full bg-slate-50 border-b-2 border-slate-200 px-0 py-4 text-black font-bold uppercase focus:border-red-600 outline-none transition-all placeholder:text-slate-200" 
+                    className="w-full bg-slate-50 border-b-2 border-slate-200 px-4 py-4 text-black font-bold uppercase focus:border-red-600 focus:bg-white outline-none transition-all placeholder:text-slate-200" 
                   />
                 </div>
                 
@@ -79,7 +84,7 @@ export default function NewProjectPage() {
                     name="category" 
                     required 
                     placeholder="MODERNÉ LÍNIE" 
-                    className="w-full bg-slate-50 border-b-2 border-slate-200 px-0 py-4 text-black font-bold uppercase focus:border-red-600 outline-none transition-all placeholder:text-slate-200" 
+                    className="w-full bg-slate-50 border-b-2 border-slate-200 px-4 py-4 text-black font-bold uppercase focus:border-red-600 focus:bg-white outline-none transition-all placeholder:text-slate-200" 
                   />
                 </div>
 
@@ -88,7 +93,7 @@ export default function NewProjectPage() {
                   <input 
                     name="location" 
                     placeholder="MESTO" 
-                    className="w-full bg-slate-50 border-b-2 border-slate-200 px-0 py-4 text-black font-bold uppercase focus:border-red-600 outline-none transition-all placeholder:text-slate-200" 
+                    className="w-full bg-slate-50 border-b-2 border-slate-200 px-4 py-4 text-black font-bold uppercase focus:border-red-600 focus:bg-white outline-none transition-all placeholder:text-slate-200" 
                   />
                 </div>
 
@@ -99,7 +104,7 @@ export default function NewProjectPage() {
                     required 
                     rows={6} 
                     placeholder="DETAILNÁ ŠPECIFIKÁCIA REALIZÁCIE..." 
-                    className="w-full bg-slate-50 border border-slate-200 p-6 text-black font-medium focus:border-red-600 outline-none transition-all placeholder:text-slate-200 resize-none" 
+                    className="w-full bg-slate-50 border border-slate-200 p-6 text-black font-medium focus:border-red-600 focus:bg-white outline-none transition-all placeholder:text-slate-200 resize-none" 
                   />
                 </div>
 
@@ -107,7 +112,7 @@ export default function NewProjectPage() {
                 <div className="md:col-span-2 pt-10 border-t border-black">
                    <div className="mb-6 flex items-center justify-between">
                       <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 font-mono">// Foto_Galéria_Projektu</label>
-                      <span className="text-[9px] text-slate-300 font-mono">Max_12_Snívkov</span>
+                      <span className="text-[9px] text-slate-300 font-mono italic">Limit: 12_Images</span>
                    </div>
                    <MultiImagePicker defaultValue={[]} />
                 </div>
@@ -117,10 +122,10 @@ export default function NewProjectPage() {
               <div className="pt-12 mt-12 border-t border-black flex justify-end">
                 <button 
                   type="submit" 
-                  className="group relative px-12 py-6 bg-black text-white font-black uppercase text-xs tracking-[0.3em] overflow-hidden transition-all"
+                  className="group relative px-16 py-6 bg-black text-white font-black uppercase text-xs tracking-[0.4em] overflow-hidden transition-all shadow-xl active:scale-95"
                 >
                   <span className="relative z-10 flex items-center gap-4">
-                    <Save size={18} /> Uložiť projekt
+                    <Save size={18} /> Save
                   </span>
                   <div className="absolute inset-0 bg-red-600 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
                 </button>
